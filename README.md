@@ -51,7 +51,7 @@ intermittent-inference-library contains the intermittent inference runtime libra
   ```python
   python3.9 -m NASBase.run_nas --stages <stage> --arc <arc> --dataset IMAGE100 --mode <mode> --vmsize <vmsize> --suffix <suffix> --no-rlogger
   ```
-  ```md
+  
   ### 📝 NAS Command Arguments
   | Option | Description | Candidate Values |
   |---|---|---|
@@ -61,7 +61,7 @@ intermittent-inference-library contains the intermittent inference runtime libra
   | `--mode` | TS optimization  | `pdq`, `tinyts`, `tinynas`, `none` |
   | `--vmsize` | VM constraint in KB | `96`, `128`, `256` |
   | `--suffix` | Experiment suffix for output naming | user-defined string |
-  ```
+  
 5. catch the solution to fill `spec_model.txt`
 6. generate the onnx for solution networks by `\TiNAS\NASBase\spec_onnx_gen.py`
 
