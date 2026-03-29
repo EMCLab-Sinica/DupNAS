@@ -65,7 +65,7 @@ Below is a brief description of the main directories and files in this repositor
   python3.9 -m NASBase.run_nas --stages <stage> --arc <arc> --dataset IMAGE100 --mode <mode> --vmsize <vmsize> --suffix <suffix> --no-rlogger
   ```
   
-  ### 📝 NAS Command Arguments
+  📝 Arguments
   | Option | Description | Candidate Values |
   |---|---|---|
   | `--stages` | Number of NAS stages: ssopt, training, evosearch, fine-tuning | `1`, `2`, `3`, `4` |
