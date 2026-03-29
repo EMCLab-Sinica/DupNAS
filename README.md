@@ -20,7 +20,7 @@ DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5
 We evaluate DupNAS on three backbone network families—MobileNetV2, ShuffleNetV2, and InceptionV3—trained on the ImageNet-100 dataset. We compare DupNAS with two existing splitting methods, TinyTS and PatchTS.
 
 <p align="center">
-  <img src="assets/figures/NAS_with_TS.svg" alt="NAS_with_TS" width="800">
+  <img src="assets/figures/NAS_with_TS.svg" alt="NAS_with_TS" width="500">
 </p>
 <p align="center">
   <em>Overview of the DupNAS</em>
