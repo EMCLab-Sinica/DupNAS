@@ -8,7 +8,6 @@
 
 ---
 ## 📝 Overview
----
 
 DupNAS is a framework for improving neural network accuracy under tight memory constraints on resource-constrained devices. It combines neural architecture search with multi-branch tensor splitting to reduce peak memory usage and make larger or more accurate networks deployable on small devices.
 
@@ -19,12 +18,19 @@ We build DupNAS by integrating our multi-branch splitting method into TinyNAS fo
 DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5-2678 CPU (2.5GHz), 128 GB RAM, and four NVIDIA GTX 1080Ti GPUs. The split-network solutions are INT8-quantized and deployed on an STM32F746 MCU with an ARM Cortex-M7 CPU 216 MHz), 320 KB VM, and 1 MB NVM, running the TFLite Micro inference engine. We also extend the TFLite Micro model converter to avoid extra NVM usage caused by duplicated weights when converting split networks from PyTorch to the deployment format.
 
 We evaluate DupNAS on three backbone network families—MobileNetV2, ShuffleNetV2, and InceptionV3—trained on the ImageNet-100 dataset. We compare DupNAS with two existing splitting methods, TinyTS and PatchTS.
+
+<p align="center">
+  <img src="assets/figures/NAS_with_TS.svg" alt="NAS_with_TS" width="800">
+</p>
+<p align="center">
+  <em>Overview of the DupNAS</em>
+</p>
 <!-- This repository contains the full artifact for reproducing the NAS, model splitting, fine-tuning, ONNX export, and MCU deployment workflow used in DupNAS. -->
 
 
 ---
 ## 📌 Directory/File Structure
----
+
 Below is a brief description of the main directories and files in this repository.
 
 - `/DupNAS/NASBase/duplication` implements the DupNAS module integrated into the NAS framework.
@@ -36,13 +42,13 @@ Below is a brief description of the main directories and files in this repositor
 - `/DupNAS/genonnx/DupNAS_SA.py` provides a standalone implementation of the DupNAS module.
 - `/Inference/Tensor-splitter/` implements ONNX model rewriting to execute the selected tensor-splitting configuration.
 - `/Inference/Tflm-engine/` implements the build process for TensorFlow Lite Micro libraries that run the models.
-- `/DupNAS_paper_data.xlsx` contains the data presented in the figures in the paper.
+- `/assets/DupNAS_paper_data.xlsx` contains the data presented in the figures in the paper.
 
 ---
 ## 🧭 Getting Started
----
 
-### 💡 Prerequisites
+
+### 💡 Requirement
 
 - `Python 3.9` is recommended.
 - Install the required Python packages listed in `requirements.txt` with:
@@ -102,12 +108,12 @@ To deploy models with [TensorFlow Lite Micro](https://github.com/tensorflow/tfli
 
 For more information, please refer to [Tflm-engine/README.md](Tflm-engine/README.md).
 
----
+
 <!-- sudo docker run --rm -it -v $(pwd):/workdir -w /workdir ghcr.io/pinto0309/onnx2tf:1.28.5   -->
 
 ---
 ## 🧩 Results
----
+For more detailed data, please see [DupNAS_paper_data](/assets/DupNAS_paper_data.xlsx)
 
 ### Accuracy
 
