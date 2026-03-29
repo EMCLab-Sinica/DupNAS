@@ -9,15 +9,12 @@
 ---
 ## 📝 Overview
 
-DupNAS is a framework for improving neural network accuracy under tight memory constraints on resource-constrained devices. It combines neural architecture search with multi-branch tensor splitting to reduce peak memory usage and make larger or more accurate networks deployable on small devices.
+DupNAS is a framework for improving neural network accuracy under tight memory constraints on resource-constrained devices. It combines neural architecture search with multi-branch tensor splitting to reduce peak memory usage, enabling larger or more accurate networks to be deployed on small devices.
 
-To address the peak memory challenge, DupNAS greatly shrinks the configuration space and incrementally explores only the configurations that can remove memory bottlenecks with low latency overhead.
+DupNAS is evaluated on three vision-based TinyML backbone families, MobileNetV2, ShuffleNetV2, and InceptionV3, under different memory budgets. All networks are trained on the ImageNet-100 dataset. We compare DupNAS with TinyTS and PatchTS, and deploy the searched networks on an STM32 microcontroller.
 
-We build DupNAS by integrating our multi-branch splitting method into TinyNAS for microcontrollers. We evaluate it on several vision-based TinyML network families under different memory budgets, and also deploy the searched networks on an STM32 microcontroller.
+DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5-2678 CPU (2.5 GHz), 128 GB RAM, and four NVIDIA GTX 1080 Ti GPUs. The split-network solutions are INT8-quantized and deployed on an STM32F746 MCU with an ARM Cortex-M7 CPU 216 MHz), 320 KB VM, and 1 MB NVM, running the TFLite Micro inference engine. 
 
-DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5-2678 CPU (2.5GHz), 128 GB RAM, and four NVIDIA GTX 1080Ti GPUs. The split-network solutions are INT8-quantized and deployed on an STM32F746 MCU with an ARM Cortex-M7 CPU 216 MHz), 320 KB VM, and 1 MB NVM, running the TFLite Micro inference engine. We also extend the TFLite Micro model converter to avoid extra NVM usage caused by duplicated weights when converting split networks from PyTorch to the deployment format.
-
-We evaluate DupNAS on three backbone network families—MobileNetV2, ShuffleNetV2, and InceptionV3—trained on the ImageNet-100 dataset. We compare DupNAS with two existing splitting methods, TinyTS and PatchTS.
 
 <p align="center">
   <img src="assets/figures/NAS_with_TS.svg" alt="NAS_with_TS" width="500">
