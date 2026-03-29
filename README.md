@@ -113,7 +113,7 @@ For more information, please refer to [Tflm-engine/README.md](Inference/Tflm-eng
 
 ---
 ## 🧩 Results
-For more detailed data, please see [DupNAS_paper_data](/assets/DupNAS_paper_data.xlsx)
+For more detailed data, please see [DupNAS_paper_data](/assets/)
 
 ### Accuracy
 
