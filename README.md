@@ -25,7 +25,7 @@ DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5
 <!-- This repository contains the full artifact for reproducing the NAS, model splitting, fine-tuning, ONNX export, and MCU deployment workflow used in DupNAS. -->
 
 
----
+
 ## 📌 File Structure
 
 Below is a brief description of the main directories and files in this repository.
