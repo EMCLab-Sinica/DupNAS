@@ -86,7 +86,7 @@ Below is a brief description of the main directories and files in this repositor
 
 ### ✂️ Tensor Splitter
 1. Copy the ONNX model and its corresponding split-configuration JSON file from `/DupNAS/genonnx/` to `/Inference/Tensor-splitter/`
-2. For more information, please refer to [Tensor-splitter/README.md](Tensor-splitter/README.md).
+2. For more information, please refer to [Inference/Tensor-splitter/README.md](Tensor-splitter/README.md).
 
 
 ### ⚙️ Inference
@@ -102,11 +102,11 @@ To deploy models with [TensorFlow Lite Micro](https://github.com/tensorflow/tfli
 
 2. Copy the converted TFLite model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
 
-3. Follow [Tflm-engine/README.md](Tflm-engine/README.md) to build the TensorFlow Lite Micro static library (`libtensorflow-microlite.a`).
+3. Follow [Tflm-engine/README.md](Inference/Tflm-engine/README.md) to build the TensorFlow Lite Micro static library (`libtensorflow-microlite.a`).
 
 4. Add the generated static library to your STM32CubeIDE project settings. Then include `Tflm-engine/src/tflm_main.h` and call `tflm_main_xxx` to run inference for the target model.
 
-For more information, please refer to [Tflm-engine/README.md](Tflm-engine/README.md).
+For more information, please refer to [Tflm-engine/README.md](Inference/Tflm-engine/README.md).
 
 
 <!-- sudo docker run --rm -it -v $(pwd):/workdir -w /workdir ghcr.io/pinto0309/onnx2tf:1.28.5   -->
