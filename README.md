@@ -30,7 +30,7 @@ DupNAS is implemented in PyTorch and developed on a server with an Intel Xeon E5
 
 Below is a brief description of the main directories and files in this repository.
 
-- `/DupNAS/NASBase/duplication` implements the DupNAS module integrated into the NAS framework.
+- `/DupNAS/NASBase/duplication` implements the multi-branch TS DupNAS module integrated into the NAS framework.
 - `/DupNAS/NASBase/ss_optimization` contains the search-space optimization component, adapted from TinyNAS .
 - `/DupNAS/NASBase/evo_search` contains the evolutionary search component, adapted from TinyNAS.
 - `/DupNAS/NASBase/model` defines the search space, supernet architecture, and subnet architecture.
@@ -54,6 +54,7 @@ Below is a brief description of the main directories and files in this repositor
 - The main dataset used in this project is [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data). You can prepare and load it using: `/DupNAS/NASBase/load_image100.py`.
 - [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html)
 - [STM32F746NG MCU](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html)
+- [TensorFlow Lite Micro](https://github.com/tensorflow/tflite-micro)
 
 ### 🔧Setup and Build for DupNAS
 
@@ -81,27 +82,22 @@ Below is a brief description of the main directories and files in this repositor
 8. Run `gen_ts_cfg.py` to collect the `split-configuration JSON file` for Tensor Splitter
 
 
-### ✂️ Tensor Splitter
-1. Copy the ONNX model and its corresponding split-configuration JSON file from `/DupNAS/genonnx/` to `/Inference/Tensor-splitter/`
-2. For more information, please refer to [Tensor-splitter/README.md](Inference/Tensor-splitter/README.md).
+### ✂️ Model-converter
 
-
-### ⚙️ Tflm-engine
-
-To deploy models with [TensorFlow Lite Micro](https://github.com/tensorflow/tflite-micro) on STM32, follow the steps below:
-
-1. Convert the ONNX models to TFLite with [onnx2tf](https://github.com/PINTO0309/onnx2tf). One convenient option is to use the official Docker image:
+1. Copy the ONNX model and its corresponding split-configuration JSON file from `/DupNAS/genonnx/` to `/Inference/Model-converter/`
+2. Split the model by [ONNX Tensor Splitter](Inference/Model-converter/README.md).
+3. Convert the ONNX models to TFLite with [onnx2tf](https://github.com/PINTO0309/onnx2tf). One convenient option is to use the official Docker image:
    ```bash
    run --rm -it -v $(pwd):/workdir -w /workdir ghcr.io/pinto0309/onnx2tf:1.28.5  
    onnx2tf -i ONNX_MODEL -oiqt
    ```
    This produces fully integer-quantized TFLite models such as `xxx_full_integer_quant.tflite`.
 
-2. Copy the converted TFLite model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
+### ⚙️ Tflm-engine
 
-3. Follow [Tflm-engine/README.md](Inference/Tflm-engine/README.md) to build the TensorFlow Lite Micro static library (`libtensorflow-microlite.a`).
-
-4. Add the generated static library to your STM32CubeIDE project settings. Then include `Tflm-engine/src/tflm_main.h` and call `tflm_main_xxx` to run inference for the target model.
+1. Copy the converted TFLite model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
+2. Follow [Tflm-engine/README.md](Inference/Tflm-engine/README.md) to build the TensorFlow Lite Micro static library (`libtensorflow-microlite.a`).
+3. Add the generated static library to your STM32CubeIDE project settings. Then include `Tflm-engine/src/tflm_main.h` and call `tflm_main_xxx` to run inference for the target model.
 
 For more information, please refer to [Tflm-engine/README.md](Inference/Tflm-engine/README.md).
 
