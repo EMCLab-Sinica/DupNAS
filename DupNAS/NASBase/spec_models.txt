@@ -1,0 +1,59 @@
+
+
+# # shuffle
+
+
+# wm=0.5, ir=128, name=shuffle_vm96_dupnas, cpb=[[2, 5, 3], [1, 7, 2], [2, 3, 3]]
+# wm=0.5, ir=96, name=shuffle_vm96_tinyts, cpb=[[2, 5, 2], [1, 3, 3], [2, 7, 2]]
+# wm=0.5, ir=96, name=shuffle_vm96_patchts, cpb=[[2, 7, 2], [2, 3, 2], [1, 7, 3]]
+
+# wm=0.5, ir=128, name=shuffle_vm128_dupnas, cpb=[[2, 5, 2], [1, 5, 3], [2, 3, 3]]
+# wm=0.5, ir=96, name=shuffle_vm128_tinyts, cpb=[[1, 5, 3], [2, 7, 1], [1, 3, 3]]
+# wm=0.5, ir=96, name=shuffle_vm128_patchts, cpb=[[2, 5, 2], [1, 3, 2], [2, 5, 3]]
+
+#wm=0.8, ir=96, name=shuffle_vm256_dupnas, cpb=[[1, 7, 3], [2, 5, 2], [1, 3, 3]]
+# wm=0.8, ir=96, name=shuffle_vm256_tinyts, cpb=[[1, 7, 3], [2, 3, 2], [1, 3, 3]]
+# wm=0.5, ir=128, name=shuffle_vm256_patchts, cpb=[[2, 5, 2], [1, 1, 2], [1, 7, 3]]
+
+# wm=0.5, ir=32, name=shuffle_vm96_nots, cpb=[[1, 5, 3], [2, 7, 2], [1, 7, 3]]
+# wm=0.5, ir=64, name=shuffle_vm128_nots, cpb=[[1, 5, 3], [2, 3, 3], [1, 7, 3]]
+# wm=0.5, ir=96, name=shuffle_vm256_nots, cpb=[[1, 5, 3], [2, 5, 2], [1, 7, 3]]
+
+
+# # mbv2
+# wm=0.25, ir=96, name=mbv2_vm96_dupnas, cpb=[[3, 3, 3], [3, 5, 3], [4, 3, 2], [6, 3, 2]]
+# wm=0.25, ir=64, name=mbv2_vm96_tinyts, cpb=[[4, 3, 2], [4, 5, 3], [4, 5, 1], [3, 5, 2]]
+# wm=0.25, ir=64, name=mbv2_vm96_patchts, cpb=[[4, 5, 1], [4, 5, 3], [6, 3, 1], [6, 3, 2]]
+
+# wm=0.25, ir=128, name=mbv2_vm128_dupnas, cpb=[[4, 3, 1], [4, 3, 2], [6, 5, 2], [4, 3, 3]]
+# wm=0.25, ir=96, name=mbv2_vm128_tinyts, cpb=[[3, 3, 3], [6, 5, 1], [3, 5, 2], [6, 3, 2]]
+# wm=0.25, ir=96, name=mbv2_vm128_patchts, cpb=[[3, 3, 1], [3, 5, 1], [3, 3, 2], [3, 3, 2]]
+
+# wm=0.25, ir=128, name=mbv2_vm256_dupnas, cpb=[[4, 3, 2], [4, 3, 2], [3, 5, 1], [4, 5, 2]]
+# wm=0.25, ir=128, name=mbv2_vm256_tinyts, cpb=[[3, 5, 1], [4, 5, 2], [3, 3, 3], [6, 3, 2]]
+# wm=0.25, ir=128, name=mbv2_vm256_patchts, cpb=[[3, 5, 1], [4, 3, 2], [3, 3, 3], [6, 3, 2]]
+
+# wm=0.25, ir=32, name=mbv2_vm96_nots, cpb=[[4, 5, 2], [6, 5, 1], [3, 3, 3], [4, 5, 1]]
+# wm=0.25, ir=32, name=mbv2_vm128_nots, cpb=[[4, 5, 1], [4, 5, 2], [6, 5, 1], [6, 3, 2]]
+# wm=0.25, ir=64, name=mbv2_vm256_nots, cpb=[[6, 3, 2], [3, 3, 3], [6, 3, 1], [6, 3, 1]]
+
+
+
+# # incpet
+# wm=0.75, ir=96, name=incept_vm96_dupnas, cpb=[[2, 3, 2, 1], [1, 3, 2, 1], [2, 3, 2, 1]]
+# wm=0.25, ir=64, name=incept_vm96_tinyts, cpb=[[2, 5, 1, 1], [1, 3, 2, 1], [2, 7, 3, 1]]
+# wm=0.25, ir=96, name=incept_vm96_patchts, cpb=[[2, 5, 2, 1], [1, 5, 2, 1], [2, 5, 3, 1]]
+
+# wm=0.5, ir=128, name=incept_vm128_dupnas, cpb=[[2, 5, 3, 1], [1, 3, 3, 1], [2, 5, 3, 1]]
+# wm=0.5, ir=64, name=incept_vm128_tinyts, cpb=[[1, 3, 3, 1], [2, 7, 2, 1], [2, 3, 2, 1]]
+# wm=0.5, ir=128, name=incept_vm128_patchts, cpb=[[2, 5, 3, 1], [2, 5, 2, 1], [2, 3, 2, 1]]
+
+# wm=0.75, ir=128, name=incept_vm256_dupnas, cpb=[[2, 7, 2, 1], [1, 5, 2, 1], [2, 3, 1, 1]]
+# wm=0.5, ir=96, name=incept_vm256_tinyts, cpb=[[1, 5, 3, 1], [2, 3, 1, 1], [2, 7, 2, 1]]
+# wm=0.75, ir=128, name=incept_vm256_patchts, cpb=[[2, 5, 2, 1], [2, 7, 1, 1], [1, 3, 2, 1]]
+
+# wm=0.5, ir=32, name=incept_vm96_nots, cpb=[[1, 5, 3, 1], [2, 7, 3, 1], [2, 7, 2, 1]]
+# wm=0.75, ir=32, name=incept_vm128_nots, cpb=[[2, 3, 3, 1], [1, 7, 1, 1], [1, 3, 2, 1]]
+# wm=0.75, ir=64, name=incept_vm256_nots, cpb=[[2, 5, 2, 1], [1, 7, 2, 1], [1, 3, 1, 1]]
+
+
