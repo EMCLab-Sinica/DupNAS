@@ -52,8 +52,8 @@ from NASBase import file_utils, utils
 
 from NASBase.evo_search.evo_memory import EvoMem, EvoMemTypes
 
-from NASBase.hw_cost.Modules_inas_v1.CostModel import common
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.CostModel import common
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')

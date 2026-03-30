@@ -20,7 +20,7 @@ from NASBase.fine_tune import fine_tune_best_solution
 from logger.remote_logger import get_remote_logger_obj, get_remote_logger_basic_init_params
 from NASBase.ss_optimization.subnet_utils import sample_subnet_configs_from_file, check_constraints, merge_constraint_stats
 
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
 from NASBase.model.common_utils import get_network_dimension, get_network_obj, netobj_to_pyobj, get_supernet, get_dummy_net_input_tensor
 
 

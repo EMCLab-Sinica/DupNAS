@@ -32,7 +32,7 @@ from NASBase.model.common_utils import (
     get_network_dimension, get_network_obj, get_subnet, parametric_supernet_blk_choices, blkchoices_to_blkchoices_ixs, get_subnet_from_config,
     get_dummy_net_input_tensor,
 )
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
 
 #sys.path.append("../..")
 from NASBase import utils as utils

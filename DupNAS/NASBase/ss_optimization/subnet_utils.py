@@ -5,8 +5,8 @@ import numpy as np
 import NASBase.utils as utils
 #from NASBase.model.mnas_arch import MNASSuperNet
 #from NASBase.model.mnas_ss import FIRST_BLOCK_EXP_FACTOR
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
-from NASBase.hw_cost.Modules_inas_v1.CostModel import cnn
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.CostModel import cnn
 
 from settings import Settings
 
@@ -196,7 +196,7 @@ def check_constraints(performance_model: PlatPerf, subnet_latency_info, subnet_o
        #     if pass_imc_constraint:
         #        constraint_stats['imc_feasible_subnets'] += 1
 #
-       #     pass_constraints = pass_constraints and pass_imc_constraint  # introduced in inas2
+       #     pass_constraints = pass_constraints and pass_imc_constraint
        # else:
      #       print('IMC constraint is skipped!')
 

@@ -311,7 +311,6 @@ def est_cost_GAVGPOOL_flops(layer, params_exec, params_pres, layer_based_cals):
         
     total_macs = 0
     # 1 add and 1 divide (for average) for each iteration in nested loops
-    # See intermittent-inference-library/cnn/cnn_pool.c in iNAS inference engine
     total_flops = (Tr * Tc * Tm * 2) * num_tiles
     
     return total_flops, total_macs

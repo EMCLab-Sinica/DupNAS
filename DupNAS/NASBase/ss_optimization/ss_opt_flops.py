@@ -10,7 +10,7 @@ import torch
 import onnx, shutil, tempfile
 
 from settings import Settings
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
 from NASBase.model.common_utils import get_network_dimension, get_network_obj, netobj_to_pyobj, get_supernet, get_dummy_net_input_tensor
 from NASBase.multiprocessing_helper import get_max_num_workers, run_multiprocessing_workers
 from NASBase.ss_optimization.subnet_utils import sample_subnet_configs, check_constraints, merge_constraint_stats

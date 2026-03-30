@@ -49,8 +49,8 @@ elif Settings.NAS_SETTINGS_GENERAL['ARC'] == 'incept':
 
 
 #from NASBase.model.common_utils import *
-from NASBase.hw_cost.Modules_inas_v1.IEExplorer.plat_perf import PlatPerf
-from NASBase.hw_cost.Modules_inas_v1.CostModel.cnn import pass_constraint_storage
+from NASBase.hw_cost.Modules_nas_v1.IEExplorer.plat_perf import PlatPerf
+from NASBase.hw_cost.Modules_nas_v1.CostModel.cnn import pass_constraint_storage
 
 from NASBase.train_supernet import get_dataset
 
