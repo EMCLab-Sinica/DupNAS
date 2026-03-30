@@ -115,7 +115,7 @@ For detailed evaluation results, please see [DupNAS_paper_data](/assets/)
 |             | 256 KB | 65.76% | 64.96% | 60.48% | [Ori.](/assets/models/onnx_original/shuffle-v256) / [TS](/assets/models/onnx_withTS/shuffle-v256) |
 | InceptionV3 | 96 KB | 61.84% | 45.68% | 54.00% | [Ori.](/assets/models/onnx_original/incept-vm96) / [TS](/assets/models/onnx_withTS/incept-vm96) |
 |             | 128 KB | 64.16% | 57.84% | 58.64% | [Ori.](/assets/models/onnx_original/incept-vm128) / [TS](/assets/models/onnx_withTS/incept-vm128) |
-|             | 256 KB | 68.24% | 64.88% | 67.36% | [Ori.](/assets/models/onnx_original/incept-v256) / [TS](/assets/models/onnx_withTS/incept-v256) |
+|             | 256 KB | 68.24% | 64.88% | 67.36% | [Ori.](/assets/models/onnx_original/incept-vm256) / [TS](/assets/models/onnx_withTS/incept-vm256) |
 
 
 
