@@ -1,25 +1,17 @@
 import sys
 
-
-#sys.path.append('./energytrace_analysis/') # uncomment if running from IntermittentNAS dir
-
 from .energytrace_analysis.energy_model_dma import predict_dma_energy
 from .energytrace_analysis.energy_model_dma import predict_dma_energy
 from .energytrace_analysis.energy_model_vecmac import predict_leavecmac_energy
 from .energytrace_analysis.energy_model_mathops import predict_mathop_energy
-
-#sys.path.append('../msp430-DL/LEA_conv_tests/Scripts/analysis/latency_analysis/')  # uncomment if running from IntermittentNAS dir
-#sys.path.append('../latency_analysis/') # if running from msp430 subdir
 from .latency_analysis.latency_model_microbench import predict_latency
 
 
 CPU_CLOCK_MSP430 = 16000000
-NVM_SPEED_SCALE_FACTOR = 1    # (<1: data tr has shorter latency, >1: data tr has longer latency)
+NVM_SPEED_SCALE_FACTOR = 1   
 
 SPI_CLOCK_DIVIDER = 4
 SPI_CLOCK = CPU_CLOCK_MSP430 / SPI_CLOCK_DIVIDER  # check SPIBRW in inference library codes
-#SPI_CLOCK = CPU_CLOCK_MSP430
-#SPI_CLOCK = CPU_CLOCK_MSP430 / 1  # check SPIBRW in inference library codes
 
 
 # if we use DATA_SZ=1, do these latencies and energy levels need to be scaled down (halved) ?

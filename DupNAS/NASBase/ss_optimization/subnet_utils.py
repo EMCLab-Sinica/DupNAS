@@ -24,20 +24,17 @@ elif Settings.NAS_SETTINGS_GENERAL['ARC'] == 'incept':
 CONSTRAINT_STAT_KEYS = {
     'vm_feasible_subnets',
     'nvm_feasible_subnets',
-    'imc_feasible_subnets',
-    'latency_feasible_subnets',
+    'latency_feasible_subnets'
 }
 CONSTRAINT_MAX_KEYS = {
     'flops_max',
     'npc_max',
-    'latency_max',
-    'imc_max',
+    'latency_max'
 }
 CONSTRAINT_MIN_KEYS = {
     'flops_min',
     'npc_min',
-    'latency_min',
-    'imc_min',
+    'latency_min'
 }
 
 def sample_subnet_configs_from_file(net: MNASSuperNet, cpb_tuples, first_block_hard_coded=False):
@@ -160,15 +157,10 @@ def check_constraints(performance_model: PlatPerf, subnet_latency_info, subnet_o
     for key in CONSTRAINT_MIN_KEYS:
         constraint_stats.setdefault(key, float('inf'))
 
-    # checking IMC or latency will also check others via find_best_solution
-    #basic_constraints_checked = 'CHK_PASS_IMC' in checked_constraints or 'CHK_PASS_RESPONSIVENESS' in checked_constraints
+    
 
     if subnet_latency_info:
-        #int_mng_cost_proportion = subnet_latency_info['imc_prop']
         latency = subnet_latency_info['perf_e2e_contpow_fp_lat']
-        #ip_tot_npc = subnet_latency_info['ip_tot_npc']
-
-        #print(f'{subnet_name} latency={latency} IMC={int_mng_cost_proportion} npc={ip_tot_npc}')
 
         def update_stats(kind, value):
             if value == -1:
@@ -177,29 +169,17 @@ def check_constraints(performance_model: PlatPerf, subnet_latency_info, subnet_o
             min_value = constraint_stats[f'{kind}_min'] = min(value, constraint_stats[f'{kind}_min'])
             print(f'{kind} min={min_value}, max={max_value}')
 
-        #update_stats('imc', int_mng_cost_proportion)
-       # update_stats('latency', latency)
-        #update_stats('npc', ip_tot_npc)
+ 
         
         print('subnet_latency_info is skipped!')
 
     else:
         print('subnet_latency_info else is skipped!')
-        #int_mng_cost_proportion = latency = ip_tot_npc = -1
+
 
     memory_checked = 'CHK_PASS_SPATIAL' in checked_constraints or 'CHK_PASS_STORAGE' in checked_constraints
     checked_constraints = checked_constraints.split(',')
-    #if 'CHK_PASS_IMC' in checked_constraints:
-       # if performance_model.PLAT_SETTINGS['IMC_CONSTRAINT'] > 0:
-       #     pass_imc_constraint, _, _ = cnn.pass_constraint_imc(int_mng_cost_proportion, performance_model.PLAT_SETTINGS)
-
-       #     if pass_imc_constraint:
-        #        constraint_stats['imc_feasible_subnets'] += 1
-#
-       #     pass_constraints = pass_constraints and pass_imc_constraint
-       # else:
-     #       print('IMC constraint is skipped!')
-
+    
     if 'CHK_PASS_RESPONSIVENESS' in checked_constraints:
         if performance_model.PLAT_SETTINGS['LAT_E2E_REQ'] > 0:
             pass_latency_constraint, _, _ = cnn.pass_constraint_responsiveness(latency, performance_model.PLAT_SETTINGS)

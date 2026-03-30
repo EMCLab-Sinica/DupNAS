@@ -97,11 +97,8 @@ LOG_SUBDIR = "supernet_randsample/"
 ###########################################
 # EXT SETTINGS CLASSES
 ###########################################
-class SettingsINTpow(Settings):
-    PLATFORM_SETTINGS = copy.deepcopy(Settings.PLATFORM_SETTINGS)
-    
-class SettingsCONTpow(Settings):
-    PLATFORM_SETTINGS = copy.deepcopy(Settings.PLATFORM_SETTINGS)
+
+
 
 
 ###########################################
@@ -151,11 +148,11 @@ def _get_remote_logger_obj(exp_type, global_settings, exp_consts, run_name_suffi
 
 
 
-def _update_rehm(global_settings: Settings):
-    cap_str = str(global_settings.PLATFORM_SETTINGS['CCAP'])
-    estimated_rehm = global_settings.PLATFORM_SETTINGS['REHM_TABLE'][cap_str]
-    global_settings.PLATFORM_SETTINGS['REHM'] = estimated_rehm
-    return global_settings
+# def _update_rehm(global_settings: Settings):
+#     cap_str = 0.005
+#     estimated_rehm = global_settings.PLATFORM_SETTINGS['REHM_TABLE'][cap_str]
+#     global_settings.PLATFORM_SETTINGS['REHM'] = estimated_rehm
+#     return global_settings
 
 def _change_constraints_settings(sett, nvm_size):
     #large_nvm_capacity = 200000000
@@ -277,49 +274,35 @@ def mpworker_subnets_accuracy(worker_id, global_settings, supernet_ckpt_fname, s
                 
                 
         
-    
+class Settingsplat(Settings):
+    def __init__(self):
+        self.PLATFORM_SETTINGS = copy.deepcopy(Settings.PLATFORM_SETTINGS)
+
 
 def mpworker_subnets_efficiency(worker_id, platform_settings, exp_suffix, dataset, supernet_blk_choices, width_multiplier, input_resolution, subnet_batch):
     supernet_config = (width_multiplier, input_resolution)
 
-    #print("_mpworker_pop_efficiency::Enter [{}]".format(worker_id))
-           
-    # create common settings    
-    global_settings_intpow = SettingsINTpow() # default settings
-    global_settings_intpow.PLATFORM_SETTINGS["POW_TYPE"] =  "INT"
-    global_settings_contpow = SettingsCONTpow() # default settings
-    global_settings_contpow.PLATFORM_SETTINGS["POW_TYPE"] = "CONT"
-    
-    # update everthing except POW_TYPE (to consider settings change from argparse)
+    global_settings_plat = Settingsplat()
+
     for k, v in platform_settings.items():
-        if k != "POW_TYPE":
-            global_settings_intpow.PLATFORM_SETTINGS[k] = v
-            global_settings_contpow.PLATFORM_SETTINGS[k] = v    
-            
-    global_settings_intpow.NAS_SETTINGS_GENERAL['DATASET'] = dataset
-    global_settings_contpow.NAS_SETTINGS_GENERAL['DATASET'] = dataset
-    
-    #pprint(global_settings_intpow.NAS_SETTINGS_GENERAL['DATASET']); sys.exit()
-    # pprint(global_settings_contpow.PLATFORM_SETTINGS)
-    # print(exp_suffix)
-    # sys.exit()        
-    
+        global_settings_plat.PLATFORM_SETTINGS[k] = v    
+
+    global_settings_plat.NAS_SETTINGS_GENERAL['DATASET'] = dataset
+
     exp_consts = {
         "ENABLE_NVM_CONSTRAINT" : ENABLE_NVM_CONSTRAINT
     }
     
-    rlog = _get_remote_logger_obj("load_supernet", global_settings_intpow, exp_consts, 
+    rlog = _get_remote_logger_obj("load_supernet", global_settings_plat, exp_consts, 
                                   run_name_suffix="_wid{}".format(worker_id),
                                   group_name_suffix="_{}_<wm={},ir={}>".format(exp_suffix, width_multiplier, input_resolution))
     
     # -- get latency
     if ENABLE_NVM_CONSTRAINT == False:
-        _change_constraints_settings(global_settings_intpow)
-        _change_constraints_settings(global_settings_contpow)  
+        _change_constraints_settings(global_settings_plat)  
     
     
-    performance_model_intpow = PlatPerf(global_settings_intpow.NAS_SETTINGS_GENERAL, global_settings_intpow.PLATFORM_SETTINGS)
-    performance_model_contpow = PlatPerf(global_settings_contpow.NAS_SETTINGS_GENERAL, global_settings_contpow.PLATFORM_SETTINGS)
+    performance_model_plat = PlatPerf(global_settings_plat.NAS_SETTINGS_GENERAL, global_settings_plat.PLATFORM_SETTINGS)
     
     #print(type(subnet_batch), np.shape(subnet_batch), len(subnet_batch)); sys.exit()
     
@@ -327,14 +310,14 @@ def mpworker_subnets_efficiency(worker_id, platform_settings, exp_suffix, datase
     for six, sn_cpb in enumerate(subnet_batch):  
         sn_cpb = sn_cpb.tolist()  
              
-        subnet_obj, subnet_pyt = get_subnet_from_config(global_settings_intpow, dataset, sn_cpb, supernet_config, subnet_idx=six)
+        subnet_obj, subnet_pyt = get_subnet_from_config(global_settings_plat, dataset, sn_cpb, supernet_config, subnet_idx=six)
             
-        subnet_latency_info = PlatPerf.get_inference_latency_verbose(performance_model_intpow, performance_model_contpow, subnet_obj, sn_cpb)
+        subnet_latency_info = PlatPerf.get_inference_latency_verbose(global_settings_plat, performance_model_plat, subnet_obj, sn_cpb)
         
         subnet_latency_info['subnet_obj'] = "Omitted for brevity" # removed to reduce json filesize
         
         # -- get flops
-        subnet_flops, _ , flops_error = performance_model_intpow.get_network_flops(subnet_obj, fixed_params=None, layer_based_cals=True)
+        subnet_flops, _ , flops_error = global_settings_plat.get_network_flops(subnet_obj, fixed_params=None, layer_based_cals=True)
         if (subnet_latency_info != None):
             subnet_latency_info['flops'] = np.sum(subnet_flops)
         
@@ -343,20 +326,12 @@ def mpworker_subnets_efficiency(worker_id, platform_settings, exp_suffix, datase
         #if (subnet_latency_info['error_codes'] == [False, None, None]):        
         batched_results.append(subnet_latency_info)    
         
-        print("_mpworker_pop_efficiency:: [wid={}] <{},{}> processing batched subnets, progress={}/{}, ipow_lat={}, imc={}".format(worker_id, 
-                                                                                                            width_multiplier, input_resolution,
-                                                                                                            six+1, len(subnet_batch), 
-                                                                                                            batched_results[-1]['perf_e2e_contpow_fp_lat'],
-                                                                                                            np.round(batched_results[-1]['imc_prop'], 2)
-                                                                                                            ))
         rlog.log({"wid" : worker_id,
-                    "wm_ir" : "<{}_{}>".format(width_multiplier, input_resolution), 
-                    "progress" : round(((six+1)/len(subnet_batch))*100,2),                    
-                    "sn_cpb" : sn_cpb,
-                    "flops" : subnet_latency_info['flops'],
-                    "lat" : batched_results[-1]['perf_e2e_contpow_fp_lat'],                    
-                    #"imc" : np.round(batched_results[-1]['imc_prop'], 2)
-                    
+                "wm_ir" : "<{}_{}>".format(width_multiplier, input_resolution), 
+                "progress" : round(((six+1)/len(subnet_batch))*100,2),                    
+                "sn_cpb" : sn_cpb,
+                "flops" : subnet_latency_info['flops'],
+                "lat" : batched_results[-1]['perf_e2e_contpow_fp_lat']        
                 })
             
              
@@ -384,11 +359,7 @@ def run_multiple_supernets_latency(global_settings: Settings):
     file_utils.dir_create(global_settings.LOG_SETTINGS['TRAIN_LOG_DIR'] + train_log_subdir)
     
     supernet_blk_choices = iter_blk_choices(settings_per_dataset['STRIDE_FACTORS'], settings_per_dataset['KERNEL_SIZES'])
-    #supernet_blk_choices = iter_blk_choices(settings_per_dataset['EXP_FACTORS'], 
-    #                                        settings_per_dataset['KERNEL_SIZES'], 
-    #                                        settings_per_dataset['MOBILENET_NUM_LAYERS_EXPLICIT'], 
-    #                                        settings_per_dataset['SUPPORT_SKIP'])
-    #print(len(supernet_blk_choices)); sys.exit()
+
     
     platform_settings = global_settings.PLATFORM_SETTINGS   
      
@@ -549,7 +520,7 @@ if __name__ == '__main__':
     test_settings = arg_parser(test_settings)
     #run(test_settings)
     
-    test_settings = _update_rehm(test_settings)
+    #test_settings = _update_rehm(test_settings)
         
     run_multiple_supernets_latency(test_settings)
     

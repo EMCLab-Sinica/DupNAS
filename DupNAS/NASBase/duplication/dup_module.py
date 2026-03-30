@@ -18,6 +18,7 @@ mode = Settings.NAS_SETTINGS_GENERAL['MODE']
 arc = Settings.NAS_SETTINGS_GENERAL['ARC']
 GOAL_PRIORITY = Settings.NAS_SETTINGS_GENERAL['GOAL']
 
+ENABLE_PDQSEL_MODE=ENABLE_PDQSEL_MODE=ENABLE_PDQSEL_MODE=None
 #choices=["dupnas", "tinyts", "patchts", "nots"]
 ENABLE_PDQSEL_MODE = mode == 'dupnas'
 if ENABLE_PDQSEL_MODE:
@@ -60,16 +61,7 @@ pp = PrettyPrinter(width=150)
 
 
 def split_into_micrographs(node_info, unsplittable_ops, merging_ops, data_usage):
-    """
-    Split the model into micrographs:
-      - Multi-branch (fan-out > 1): one micrograph per branch, excluding shared & merge nodes.
-      - Single path (no fan-out/fan-in): one micrograph covering the linear chain between boundaries.
-    
-    Boundaries:
-      - unsplittable op
-      - merge/join op (fanin > 1 or op_type in merging_ops)
-      - split (fanout > 1, treated specially at roots)
-    """
+
     N = len(node_info)
 
     def successors(idx):
@@ -1304,7 +1296,7 @@ def solve_interval(cand_ops,
                    search_dxq, search_dxq_single_branch,
                    cannot_dup):
   
-   crosses_branch = False
+    crosses_branch = False
     s = cand_ops[0]
     e = cand_ops[-1]
     for major in total_sets_of_branches:
@@ -2927,12 +2919,8 @@ def model_tracing(onnx_path, onnx_name):
     # bytes -> model (already in your code)
     onnx.checker.check_model(onnx_model)
 
-    # 🔧 strip trivial Identity wrappers (opset 11 safe)
     inferred_model  = strip_param_identity_nodes(onnx_model)
     onnx.checker.check_model(inferred_model)
-    # write atomically
-    #with open(onnx_file, "wb") as f:
-    #    f.write(onnx_model.SerializeToString())
 
 
     #inferred_model = onnx.shape_inference.infer_shapes(onnx_model)
@@ -2959,33 +2947,20 @@ def model_tracing(onnx_path, onnx_name):
 
     # Load and analyze the model
     input_info, output_info = get_io_info(inferred_model)
-    #print("Model Inputs:", input_info)
-    #print("Model Outputs:", output_info)
 
-    # Get node I/O information and total node count
     node_info, total_nodes = get_node_io_info(inferred_model)
     #print(total_nodes)
-
-     
 
     #print(op_order)
     shared_inputs = identify_shared_inputs(node_info)
     #print("shared_inputs: ", shared_inputs)
 
     set_of_op_over_br, end_of_branch_nodes = identify_end_of_branches(node_info)
-    #print("end_of_branch_nodes: ", end_of_branch_nodes)
-    #print("set_of_op_over_br: ", set_of_op_over_br)
-    #set_of_op_goto_br, total_sets_of_branches = identify_branches(node_info, shared_inputs, end_of_branch_nodes, set_of_op_over_br)
-    total_sets_of_branches = identify_branches_hierarchical(node_info)
-    #print("set_of_op_goto_br: ", set_of_op_goto_br)
-    #print("set_of_op_over_br: ", set_of_op_over_br)
-    #print("Total Sets of Branches:", total_sets_of_branches)
 
-    #op_order=[]
-    #for i in range(0,total_nodes):
-    #    op_order.append(i)
+    total_sets_of_branches = identify_branches_hierarchical(node_info)
+
     op_order = list(range(total_nodes))
-    #op_order = [0,1,14,15,16,8,9,10,11,12,13,4,5,6,7,2,3,17]
+
     #print(op_order)
     all_node_orders=[]
     all_node_orders.append(op_order)
@@ -3026,9 +3001,7 @@ def model_tracing(onnx_path, onnx_name):
 
     mem_usage['over_mem_idx'] = which_over_mem
 
-    #print("which_over_mem: ", which_over_mem)
-    #print("op_order_by_peak: ", op_order_by_peak)
-    #mem_usage_all_orders.append(mem_usage)
+
 
         #plot mem usage in different order
     model_name = onnx_path+onnx_name + '_order_0' 
@@ -3038,23 +3011,6 @@ def model_tracing(onnx_path, onnx_name):
 
         #pp.pprint(data_usage)
 
-    #for midx, mu in enumerate(mem_usage_all_orders):
-        #print("peak mem in order ",midx, " : ", mu['peak'])
-
-    # Write mem_usage_all_orders to a text file with detailed information
-    # for idx, node in enumerate(node_info):
-    #     print(f"--- Node {idx} ---")
-    #     print(f"Name: {node['node_name']}")
-    #     print(f"Type: {node['op_type']}")
-    #     print(f"Inputs: {node['inputs']}")
-    #     print(f"Outputs: {node['outputs']}")
-    #     print(f"Input Shapes: {node['input_shapes']}")
-    #     print(f"Output Shapes: {node['output_shapes']}")
-    #     print(f"Attributes: {node['attributes']}")
-    #     print(f"Data In Index: {node['data_in']}")
-    #     print(f"Data Out Index: {node['data_out']}")
-    #     print(f"Branch Label: {node['br_label']}")
-    #     print()  # blank line between nodes
 
     # === Export node_info ===
     if EXPORT_FILE:
@@ -3174,11 +3130,7 @@ def model_tracing(onnx_path, onnx_name):
                             if con['subgraph']:
                                 under_mem = (con['after_peak_mem'] <= AVAILABLE_VM )
 
-                            # for con in total_pdq_config:
-                            #     if not con['dup_config']:
-                            #         under_mem = False 
-                                    #under_mem and con['dup_config']['under_mem']
-                            #under_mem = all(con['after_peak_mem'] <= AVAILABLE_VM for con in total_pdq_config)
+
                 else:
                     under_mem = False
 
@@ -3248,9 +3200,6 @@ def model_tracing(onnx_path, onnx_name):
                 #print(f"weight_access: {weight_access}, q = 1")
                 total_weight_access += weight_access
 
-        #print(f"total_base_macs: {total_base_macs}")
-        #print(f"total_weight_access: {total_weight_access}")
-
         op_in_dup =[]
         total_split_macs_gap = 0
         if total_pdq_config : #and under_mem:
@@ -3272,10 +3221,6 @@ def model_tracing(onnx_path, onnx_name):
 
                         op_in_dup.append(op)
 
-            #print(f"total_split_macs_gap: {total_split_macs_gap}")
-            #print(f"[MACs] increased percentage: {total_split_macs_gap/total_base_macs}\n")
-            #print(f"total_increased_weight_access: {total_increased_weight_access}")
-            #print(f"[Access] increased percentage: {total_increased_weight_access/total_weight_access}\n")
             ori_mac = total_base_macs
             plus_mac = total_split_macs_gap
             ori_access = total_weight_access
@@ -3283,9 +3228,6 @@ def model_tracing(onnx_path, onnx_name):
 
             gap_macs = total_split_macs_gap/total_base_macs
             access_gap = total_increased_weight_access/total_weight_access
-                # total_MAC_gap += gap_macs
-                # if max_MAC_gap < gap_macs:
-                #     max_MAC_gap = gap_macs
 
         else:
             #print(f"TS does not help")
@@ -3320,7 +3262,6 @@ def model_tracing(onnx_path, onnx_name):
         #print("micrographs: ", micrographs)
 
 
-        #ori_peak_per_micro = [max((mem_usage['total'][op] for op in micro), default=0) for micro in micrographs]
         micrographs.sort(key=lambda micro: max((mem_usage['total'][op] for op in micro), default=0), reverse=True)
         #print("ori_peak_per_micro: ", ori_peak_per_micro)
         #print("sorted micrographs: ", micrographs)
@@ -3375,12 +3316,7 @@ def model_tracing(onnx_path, onnx_name):
                             check_pn = False
                 else:
                     check_pn = True
-                
 
-                #print(f"  Op {op}: Total Mem = {mem_usage['total'][op]}  Type: {node_info[op]['op_type']}")
-            #peak_nodes = sorted(micro, key=lambda x: mem_usage['total'][x], reverse=True)
-            #for op in peak_nodes:
-                #print(f"  Op {op}: Total Mem = {mem_usage['total'][op]}  Type: {}")
             
             if check_pn:
                 best_peak_per_sp = 0
@@ -3390,9 +3326,6 @@ def model_tracing(onnx_path, onnx_name):
                 for sp_height in SP_HEIGHT_LIST:
                 #duplicated_ops, split_tensors = estimate_operator_duplication(micro, node_info, split_height=1)
                     duplicated_ops, split_tensors = estimate_operator_duplication(micro, node_info, sp_height)
-                    
-                    #for op_idx, num_copies in duplicated_ops:
-                        #print(f"    -> Need to duplicate Op {op_idx} x{num_copies}")
 
                     expanded_ops = build_expanded_ops(micro, duplicated_ops, split_tensors, node_info)
 
@@ -3407,16 +3340,12 @@ def model_tracing(onnx_path, onnx_name):
                         #print(f"mode: {mode}")
                         #print(sched)
                         life = get_split_tensor_lifetime(sched, data_usage)
-                        #print(f"life :{life}")
-                        #life = get_tensor_lifetime(sched, expanded_ops, mode)
+
                         lifetime_by_mode[(m_id, mode)] = life
-                        #print(f"\n  [{mode.upper()} Schedule] Lifetime:\n")
-                        #for t, (start, end, size) in life.items():
-                            #print(f"    Tensor {t}: {start} → {end} ; size:{size}\n")
+
                         
                         opname_to_step = build_opname_to_step(sched)
                         #print(opname_to_step)
-                        #peak_mem, timeline = estimate_peak_memory_from_lifetime(life, data_usage, opname_to_step)
                         peak_bin, tensor_offsets,retain_from_br_in = bin_packing_memory_allocation(life, data_usage, node_info, opname_to_step, set_of_op_start_br, set_of_op_end_br)
 
                         if retain_from_br_in >0:
@@ -3483,10 +3412,7 @@ def model_tracing(onnx_path, onnx_name):
 
                 for op in micro:
                     if node_info[op]["op_type"] == "Conv":
-                        #if node_info[op]["input_shapes"][0][2] == None:
-                            #print(node_info[op])
-                        #print((node_info[op]["input_shapes"][0][2], peak_mem_per_micro[-1][2]))
-
+                      
                         num_sp = (node_info[op]["input_shapes"][0][2] // peak_mem_per_micro[-1][2]) // node_info[op]["attributes"]['kernel_shape'][0]
                         
                         base_macs, split_macs = compute_conv_macs_from_node(node_info[op], num_sp)
@@ -3498,8 +3424,6 @@ def model_tracing(onnx_path, onnx_name):
                         increased_weight_access = compute_conv_access_from_node(node_info[op],num_sp)
                         total_increased_weight_access += increased_weight_access
 
-                #print(f"total_base_macs: {total_base_macs}")
-                #print(f"total_split_macs: {total_split_macs}\n")
 
                 
                 MACs_num_per_micro_ori.append(total_base_macs)
@@ -3553,12 +3477,7 @@ def model_tracing(onnx_path, onnx_name):
         total_macs_after_split = sum(MACs_num_per_micro)
         total_access_without_split = sum(access_per_micro)
         total_access_after_split = sum(incrased_access_per_micro)
-        #print(f"total_macs_without_split: {total_macs_without_split}")
-        #print(f"total_macs_gap_after_split: {total_macs_after_split}")
-        #print(f"[MACs] increased percentage: {total_macs_after_split/total_macs_without_split}\n")
-        #print(f"total_access_without_split: {total_access_without_split}")
-        #print(f"total_access_gap_after_split: {total_access_after_split}")
-        #print(f"[Access] increased percentage: {total_access_after_split/total_access_without_split}\n")
+
        
         ori_mac = total_macs_without_split
         plus_mac = total_macs_after_split
@@ -3566,11 +3485,7 @@ def model_tracing(onnx_path, onnx_name):
         plus_access = total_access_after_split
 
 
-        #gap_macs = total_macs_after_split/total_macs_without_split
-        #access_gap = total_access_after_split/total_access_without_split
-        # if max_MAC_gap < gap_macs:
-        #     max_MAC_gap = gap_macs
-    
+
     elif ENABLE_TINYNAS_MODE:
         print(f"TS MODE: tinynas - patch-based \n")
 
@@ -3588,16 +3503,12 @@ def model_tracing(onnx_path, onnx_name):
                 continue
             patch_ops = list(range(0, end + 1))
             if any(node_info[op]['op_type'] in unsplittable_ops for op in patch_ops):
-                #for op in patch_ops:
-                #    if node_info[op]['op_type'] in unsplittable_ops:
-                #        print(f"op {op}, type: {node_info[op]['op_type'] }")
+
                 print(f"break: contain unsplittable ops, patchop:{patch_ops}")
                 break  # skip if any op is unsplittable
 
             if any(node_info[op]['op_type'] in merging_ops for op in patch_ops):
-                #for op in patch_ops:
-                #    if node_info[op]['op_type'] in merging_ops:
-                #        print(f"op {op}, type: {node_info[op]['op_type'] }")
+
                 print(f"break: contain merging ops, patchop:{patch_ops}")
                 break  # skip if any op is unsplittable
             
@@ -3766,13 +3677,6 @@ def model_tracing(onnx_path, onnx_name):
         else:
             min_tried_not_pass = None
 
-
-
-        # === Output
-        
-        
-        #print(f"tried_num:{tried_num}")
-        
         
 
     else:
@@ -3799,244 +3703,5 @@ def model_tracing(onnx_path, onnx_name):
         return which_over_mem, mem_usage['peak'] , min_mem_result, min_latency_result, min_tried_not_pass
     else:
         return which_over_mem, mem_usage['peak'], total_macs, total_access
-    #dup_path, est_peak_per_path, q_list_per_path
-    #dup_path, est_peak_per_path, q_list_per_path
 
 
-
-# === Test Entrypoint ===
-# def run_test(onnx_file_path):
-
-#     model_name = os.path.splitext(os.path.basename(onnx_file_path))[0]
-#     onnx_path = os.path.dirname(onnx_file_path) + '/'
-    
-
-#     #full_start_time = datetime.now()
-#     full_start_time = time.time()
-
-#     if ENABLE_PDQSEL_MODE:
-#         which_over_mem, oripeak, total_latency, under_mem, total_pdq_config, duration, time_record, remaining_peaks, ori_mac, plus_mac, ori_access, plus_access, max_mem_without_dup = model_tracing(onnx_path, model_name)
-#     elif ENABLE_MICROGRAPH_MODE:
-#         which_over_mem, oripeak, duplicated_per_micro, split_ts_per_micro, micrographs, peak_mem_per_micro, inner_time, unsplittable_op_indices, maxone_unsp, ori_mac, plus_mac, ori_access, plus_access = model_tracing(onnx_path, model_name)
-#     elif ENABLE_TINYNAS_MODE:
-#         which_over_mem, oripeak, min_mem_result, min_latency_result, tried_but_not_valid = model_tracing(onnx_path, model_name)
-
-#     else:
-#         which_over_mem, oripeak, total_macs, total_access = model_tracing(onnx_path, model_name) 
-
-#     #full_end_time = datetime.now()
-#     full_end_time = time.time()
-    
-#     #pp.pprint(total_pdq_config)
-
-#     full_duration = full_end_time - full_start_time
-#     #print("Full_Elapsed time:", full_duration)
-#     #print("Seconds:", full_duration.total_seconds())
-
-#     if ENABLE_PDQSEL_MODE:
-#         #print("total_latency: ", total_latency)
-#         #print("under_mem: ", under_mem)
-#         peak_after_dup = 0
-#         if total_pdq_config:
-            
-#             for idx, entry in enumerate(total_pdq_config):
-#                 if entry['subgraph'] and (entry['after_peak_mem'] > peak_after_dup):
-#                     peak_after_dup = entry['after_peak_mem']
-        
-#         peak_for_all = max(max_mem_without_dup, peak_after_dup)
-
-#         if EXPORT_FILE:
-#             output_file = onnx_path+model_name+"_pdq_config_detail_VM"+str(AVAILABLE_VM//1024)+"_goal_"+GOAL_PRIORITY+".txt"
-
-#             with open(output_file, "w") as f:
-#                 f.write(f"under_mem:{under_mem}\n")
-#                 f.write(f"peak node list:{which_over_mem}\n"), 
-#                 f.write(f"Full_duration:{full_duration}(s)\n")
-#                 f.write(f"Peak memory for all: : {peak_for_all} bytes ({peak_for_all // 1024} KB)\n")
-                
-#                 if total_pdq_config:
-#                     f.write(f"Peak memory under dup: : {peak_after_dup} bytes ({peak_after_dup // 1024} KB)\n")
-#                     f.write(f"ori MAC: {ori_mac}\n") 
-#                     f.write(f"ori weight access: {ori_access}\n\n") 
-#                     f.write(f"Total MAC increased: {plus_mac}\n") 
-#                     f.write(f"Total weight access increased: {plus_access}\n\n")
-#                     f.write(f"The useful subgraphs idx: {[idx for idx, cf in enumerate(total_pdq_config) if cf['dup_config'] and cf['dup_config']['under_mem']]}\n")
-#                     f.write(f"remaining_peaks: {[rp for rp in remaining_peaks]}\n\n")
-
-#                     f.write("Total PDQ Configuration Details\n")
-#                     f.write("="*40 + "\n")
-#                     for idx, entry in enumerate(total_pdq_config):
-#                         f.write(f"Subgraph #{idx+1}\n")
-#                         f.write(f"  Subgraph Ops: {entry['subgraph']}\n")
-#                         f.write(f"  Original Peak Memory: {entry['ori_peak_mem']}\n")
-#                         f.write(f"  Optimized Peak Memory: {entry['after_peak_mem']}\n")
-#                         f.write(f"  Peak Operator Index: {entry['peak']}\n")
-#                         f.write("  Duplication Config:\n")
-#                         if entry['dup_config']:
-#                             dup = entry['dup_config']
-#                             f.write(f"    under memory constraint: {dup['under_mem']}\n")
-#                             f.write(f"    Selected d: {dup['d']}\n")
-#                             f.write(f"    d_candidate_num: {dup['d_candidate_num']}\n")
-#                             f.write(f"    Selected q: {dup['q']}\n")
-#                             f.write(f"    q_candidates: {dup['q_candidate']}\n")
-#                             f.write(f"    Total Memory Under q: {dup['total_mem_under_q']}\n")
-#                             f.write(f"    Final Peak Memory: {dup['peak_mem']}\n")
-#                         f.write("-"*40 + "\n")
-#                 else:
-#                     f.write(f"Peak memory: : no need to dup, same as original one\n")
-
-        
-#     elif ENABLE_MICROGRAPH_MODE and micrographs:
-#         peak_after_sp = 0
-#         for m_id, micro in enumerate(micrographs):
-#             micro_peak, micro_mode, micro_sp = peak_mem_per_micro[m_id]
-
-#             if micro_peak > peak_after_sp:
-#                 peak_after_sp = micro_peak
-        
-#         if maxone_unsp > peak_after_sp:
-#             peak_after_sp = maxone_unsp
-
-#         if EXPORT_FILE:
-#             output_file = onnx_path+model_name+"_micrograph_rep_"+str(AVAILABLE_VM//1024)+"_goal_"+GOAL_PRIORITY+".txt"
-#             with open(output_file, "w") as f:
-#                 f.write(f"Full_duration:{full_duration}(s)\n")
-#                 f.write(f"peak node list:{which_over_mem}\n"), 
-#                 f.write(f"MICROGRAPH_duration:{inner_time}(s)\n")
-#                 f.write(f"Peak memory: : {peak_after_sp} bytes ({peak_after_sp // 1024} KB)\n")
-#                 f.write(f"ori MAC: {ori_mac}\n") 
-#                 f.write(f"ori weight access: {ori_access}\n\n") 
-#                 f.write(f"Total MAC increased: {plus_mac}\n") 
-#                 f.write(f"Total weight access increased: {plus_access}\n\n")
-                    
-#                 for m_id, micro in enumerate(micrographs):
-#                     f.write(f"\nMicro-Graph {m_id}: {micro}\n")
-#                     f.write(f"peak_mem_per_micro: {peak_mem_per_micro[m_id]}\n")
-
-                    
-#                     for(op_idx, num_copies),(_,split_ts) in zip(duplicated_per_micro[m_id], split_ts_per_micro[m_id]):
-#                         f.write(f"    -> Need to duplicate Op {op_idx} x{num_copies} for split input tensor num: {split_ts} \n")
-
-#                 f.write("\nUnsplittable Operators:\n")
-#                 f.write(f"{','.join(map(str, unsplittable_op_indices))}\n")
-
-#     elif ENABLE_TINYNAS_MODE:
-#         #which_over_mem, min_mem_result, min_latency_result
-
-
-#         if EXPORT_FILE:
-#             output_file = onnx_path + model_name + "_tinynas_repfor2_VM" + str(AVAILABLE_VM // 1024)+ ".txt"
-#             with open(output_file, "w") as f:
-#                 f.write(f" Full_duration: {full_duration}(s)\n")
-#                 f.write(f" Peak node list:{which_over_mem}\n"), 
-#                 f.write("-" * 40 + "\n")
-                
-#                 if min_latency_result:
-
-#                     f.write(f" Patch selected by min latency/comp: \n")
-#                     f.write(f" Start Op: {min_latency_result['start']}, End Op: {min_latency_result['end']}\n")
-#                     f.write(f" Patch Split q: {min_latency_result['q']}\n")
-#                     f.write(f" >>> Total Peak Memory : {min_latency_result['total_peak_mem']} bytes ({min_latency_result['total_peak_mem'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage within Patch: {min_latency_result['peak_mem_within_patch']} bytes ({min_latency_result['peak_mem_within_patch'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage per layer: {min_latency_result['maxone_unsp']} bytes ({min_latency_result['maxone_unsp'] // 1024} KB)\n")
-#                     f.write(f" >>> full mac plus: {min_latency_result['mac_gap']}\n")
-#                     f.write(f" >>> full access plus : {min_latency_result['access_gap']}\n")
-#                     f.write(f" full mac ori: {min_latency_result['mac_ori'] + min_latency_result['mac_other']}\n")
-#                     f.write(f" full access ori : {min_latency_result['access_ori'] + min_latency_result['access_other']}\n")
-                    
-#                     f.write(f" Within Patch: \n")
-#                     f.write(f" -- mac_ori : {min_latency_result['mac_ori']}\n")
-#                     f.write(f" -- mac_gap : {min_latency_result['mac_gap']}\n")
-#                     f.write(f" -- access_ori : {min_latency_result['access_ori']}\n")
-#                     f.write(f" -- access_gap : {min_latency_result['access_gap']}\n")
-                
-#                 if min_mem_result:
-
-#                     f.write("-" * 40 + "\n")
-#                     f.write(f" Patch selected by min memory: \n")
-#                     f.write(f" Start Op: {min_mem_result['start']}, End Op: {min_mem_result['end']}\n")
-#                     f.write(f" Patch Split q: {min_mem_result['q']}\n")
-#                     f.write(f" >>> Total Peak Memory : {min_mem_result['total_peak_mem']} bytes ({min_mem_result['total_peak_mem'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage within Patch: {min_mem_result['peak_mem_within_patch']} bytes ({min_mem_result['peak_mem_within_patch'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage per layer: {min_mem_result['maxone_unsp']} bytes ({min_mem_result['maxone_unsp'] // 1024} KB)\n")
-#                     f.write(f" >>> full mac plus: {min_latency_result['mac_gap']}\n")
-#                     f.write(f" >>> full access plus : {min_latency_result['access_gap']}\n")
-#                     f.write(f" full mac ori: {min_latency_result['mac_ori'] + min_latency_result['mac_other']}\n")
-#                     f.write(f" full access ori : {min_latency_result['access_ori'] + min_latency_result['access_other']}\n")
-                    
-#                     f.write(f" Within Patch: \n")
-#                     f.write(f" -- mac_ori : {min_mem_result['mac_ori']}\n")
-#                     f.write(f" -- mac_gap : {min_mem_result['mac_gap']}\n")
-#                     f.write(f" -- access_ori : {min_mem_result['access_ori']}\n")
-#                     f.write(f" -- access_gap : {min_mem_result['access_gap']}\n")
-                
-#                 if tried_but_not_valid:
-
-#                     f.write("-" * 40 + "\n")
-#                     f.write(f" Patch selected by min memory: \n")
-#                     f.write(f" Start Op: {tried_but_not_valid['start']}, End Op: {tried_but_not_valid['end']}\n")
-#                     f.write(f" Patch Split q: {tried_but_not_valid['q']}\n")
-#                     f.write(f" >>> Total Peak Memory : {tried_but_not_valid['total_peak_mem']} bytes ({tried_but_not_valid['total_peak_mem'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage within Patch: {tried_but_not_valid['peak_mem_within_patch']} bytes ({tried_but_not_valid['peak_mem_within_patch'] // 1024} KB)\n")
-#                     f.write(f" Peak Memory Usage per layer: {tried_but_not_valid['maxone_unsp']} bytes ({tried_but_not_valid['maxone_unsp'] // 1024} KB)\n")
-#                     f.write(f" >>> full mac plus: {tried_but_not_valid['mac_gap']}\n")
-#                     f.write(f" >>> full access plus : {tried_but_not_valid['access_gap']}\n")
-#                     f.write(f" full mac ori: {tried_but_not_valid['mac_ori'] + tried_but_not_valid['mac_other']}\n")
-#                     f.write(f" full access ori : {tried_but_not_valid['access_ori'] + tried_but_not_valid['access_other']}\n")
-                    
-#                     f.write(f" Within Patch: \n")
-#                     f.write(f" -- mac_ori : {tried_but_not_valid['mac_ori']}\n")
-#                     f.write(f" -- mac_gap : {tried_but_not_valid['mac_gap']}\n")
-#                     f.write(f" -- access_ori : {tried_but_not_valid['access_ori']}\n")
-#                     f.write(f" -- access_gap : {tried_but_not_valid['access_gap']}\n")
-
-
-            
-
-#     if ENABLE_PDQSEL_MODE:
-#         return full_duration, under_mem, mac_count
-#     elif ENABLE_MICROGRAPH_MODE:
-#         return full_duration, peak_after_sp, mac_count
-#     elif ENABLE_TINYNAS_MODE:
-#         return full_duration, min_mem_result, min_latency_result
-#     else:
-#         return full_duration
-   
-
-
-
-# if __name__ == "__main__":
-#     #test_model_path = "./sample_shuffle.onnx" #shuffle1,2 incept1,2,3
-#     total_time = 0
-#     max_time = 0
-
-
-#     pass_cons = 0
-#     total_MAC_gap = 0
-#     max_MAC_gap = 0
-#     mac_count = 0
-
-#     test_model_path = DIR_PATH + MODEL_NAME + ".onnx"
-    
-
-#     if ENABLE_PDQSEL_MODE:
-#         full_sec, under_mem, mac_count = run_test(test_model_path)
-#         if under_mem:
-#             pass_cons += 1
-#     elif ENABLE_MICROGRAPH_MODE:
-#         full_sec, peak_after_sp, mac_count = run_test(test_model_path)
-#         if peak_after_sp <= AVAILABLE_VM:
-#             pass_cons += 1
-#     elif ENABLE_TINYNAS_MODE:
-#         full_sec, min_mem_result, min_latency_result = run_test(test_model_path)
-#         if min_mem_result:
-#             pass_cons += 1
-#         if min_latency_result:
-#             pass_cons += 1
-
-#     else:  # only tracing model to get memory usage info
-#         full_sec = run_test(test_model_path)
-
-#     print(f"pass_cons: {pass_cons}, total_percent: 1 \n")
-#     print(f"execution_time: {full_sec}\n")
-#    

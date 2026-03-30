@@ -55,10 +55,10 @@ class LatencyEstimator(object):
         self.dataset = global_settings.NAS_SETTINGS_GENERAL['DATASET']
         
     
-    def _get_net_perf(self, subnet_obj, settings_inst, fixed_params=None, power_type='CONT'):        
+    def _get_net_perf(self, subnet_obj, settings_inst, fixed_params=None):        
         #print("get_network_perf::Enter")
         performance_model = PlatPerf(settings_inst.NAS_SETTINGS_GENERAL, settings_inst.PLATFORM_SETTINGS)
-        time_performance, exec_design, error = performance_model.get_inference_latency(subnet_obj, fixed_params=fixed_params, power_type=power_type)
+        time_performance, exec_design, error = performance_model.get_inference_latency(subnet_obj, fixed_params=fixed_params)
         
         #subnet_cust_net_obj = 
         return time_performance, exec_design, error   
@@ -79,7 +79,7 @@ class LatencyEstimator(object):
             subnet_obj = get_network_obj(subnet_dims)       
                         
     
-            e2e_lat_contpow_fp, exec_design_contpow_fp, error_contpow_fp = self._get_net_perf(subnet_obj, self.global_settings, power_type='CONT')                        
+            e2e_lat_contpow_fp, exec_design_contpow_fp, error_contpow_fp = self._get_net_perf(subnet_obj, self.global_settings)                        
 
            
                 
@@ -99,30 +99,6 @@ class LatencyEstimator(object):
         
         return subnet_latency_info
 
-    
-    
-    
-    def predict_efficiency(self, net_config, supernet_config, input_ch):
-        width_multiplier, input_resolution = supernet_config
-
-        pow_type = self.global_settings.PLATFORM_SETTINGS['POW_TYPE']
-        # supernet = get_supernet(self.global_settings, self.dataset, load_state=False)        
-        blk_choices = parametric_supernet_blk_choices(global_settings=self.global_settings)
-        # get_subnet() wants block choice *indices*
-        subnet_choice_per_blk = blkchoices_to_blkchoices_ixs(blk_choices, net_config)
-        subnet = get_subnet(self.global_settings, self.dataset, blk_choices, subnet_choice_per_blk, -1, width_multiplier, input_resolution)
-        net_latency_info = self.predict_network_latency(net_config, subnet, input_resolution, input_ch)
-        
-        if pow_type == 'CONT':
-            lat = net_latency_info['perf_e2e_contpow_fp_lat']
-        #elif pow_type == 'INT':
-        #    lat = net_latency_info['perf_e2e_intpow_lat']
-        else:
-            sys.exit(inspect.currentframe().f_code.co_name+"::Error - unknown pow_type, " + pow_type)
-
-        #imc = net_latency_info['imc_prop']
-        
-        return lat
         
     def predict_nvm_usage(self, net_config, supernet_config,):
         performance_model = PlatPerf(self.global_settings.NAS_SETTINGS_GENERAL, self.global_settings.PLATFORM_SETTINGS)

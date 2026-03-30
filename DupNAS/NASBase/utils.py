@@ -165,7 +165,7 @@ def random_range(start, stop=None, step=None):
     # 
     offset = random.randint(0,maximum) * 2 + 1      # Pick a random odd-valued offset.
     multiplier = 4*(maximum//4) + 1                 # Pick a multiplier 1 greater than a multiple of 4.
-    modulus = int(2**math.ceil(math.log2(maximum))) # Pick a modulus just big enough to generate all numbers (power of 2).
+    modulus = int(2**math.ceil(math.log2(maximum))) # Pick a modulus just big enough to generate all numbers
     # Track how many random numbers have been returned.
     found = 0
     while found < maximum:

@@ -220,12 +220,6 @@ def check_add(layer):
     else:
         pprint(layer); return False
     
-    
-
-#######################
-# Power cycles
-#######################
-
 
 def _num_tiles(H, W, R, C, M, N, Tr, Tc, Tm, Tn, layer_type='CONV', op_type=OPTYPES.O_CONV2D):
     if (layer_type == 'CONV') or (layer_type == 'FC'):
@@ -246,14 +240,14 @@ def _num_tiles(H, W, R, C, M, N, Tr, Tc, Tm, Tn, layer_type='CONV', op_type=OPTY
         sys.exit(inspect.currentframe().f_code.co_name+"::Error - unknown layer type")        
     return nt
 
-# num power cycles where n=0 and n>0
+# num cycles where n=0 and n>0
 def _num_pow_cycles(H, W, R, C, M, N, Tr, Tc, Tm, Tn, S, inter_lo, layer_type='CONV', op_type=OPTYPES.O_CONV2D):
     
     if (layer_type == 'CONV') or (layer_type == 'FC'):
         if op_type == OPTYPES.O_CONV2D_DW or op_type == OPTYPES.O_CONV1D_DW:
             npc = (np.ceil(R/Tr) * np.ceil(C/Tc) * np.ceil(M/Tm))/S
             # Not using N/Tn as Tn=1 for DWCONV
-            # how many power cycles where n=0 ?
+            # how many cycles where n=0 ?
             if inter_lo == 'reuse_I' or inter_lo == 'reuse_W':
                 n0 = (np.ceil(R/Tr) * np.ceil(C/Tc)) / S        
             elif inter_lo == 'reuse_O':
@@ -263,7 +257,7 @@ def _num_pow_cycles(H, W, R, C, M, N, Tr, Tc, Tm, Tn, S, inter_lo, layer_type='C
 
         else:
             npc = (np.ceil(R/Tr) * np.ceil(C/Tc) * np.ceil(M/Tm) * np.ceil(N/Tn))/S
-            # how many power cycles where n=0 ?
+            # how many cycles where n=0 ?
             if inter_lo == 'reuse_I' or inter_lo == 'reuse_W':
                 n0 = (np.ceil(R/Tr) * np.ceil(C/Tc) * np.ceil(M/Tm)) / S        
             elif inter_lo == 'reuse_O':

@@ -20,7 +20,6 @@ import numpy as np
 
 from .handler import (
     find_best_solution,
-    get_layer_data_access_cost,
     find_layer_cost_fixed_solution,
     find_layer_flops_fixed_solution,
     find_layer_vm_usage_fixed_solution,
@@ -40,16 +39,9 @@ from settings import Settings
 #from file_utils import NumpyEncoder
 
 
-# Copy PLATFORM_SETTINGS in a constructor to get overridden values towards PLATFORM_SETTINGS
-class SettingsINTpow(Settings):
+class Settingsplat(Settings):
     def __init__(self):
         self.PLATFORM_SETTINGS = copy.deepcopy(Settings.PLATFORM_SETTINGS)
-        self.PLATFORM_SETTINGS["POW_TYPE"] = "INT"
-
-class SettingsCONTpow(Settings):
-    def __init__(self):
-        self.PLATFORM_SETTINGS = copy.deepcopy(Settings.PLATFORM_SETTINGS)
-        self.PLATFORM_SETTINGS["POW_TYPE"] = "CONT"
 
 
 class PlatPerf:
@@ -62,15 +54,9 @@ class PlatPerf:
     
     # get cost profile per platform (using the benchmark measurements)                
     def get_cost_model(self):
-        #if self.PLAT_SETTINGS['MCU_TYPE'] == "MSP430":
         plat_cost_profile = PlatformCostModel.PLAT_MSP430_EXTNVM
-        
-        # elif self.PLAT_SETTINGS['MCU_TYPE'] == "MSP432":
-        #     plat_cost_profile = PlatformCostModel.PLAT_MSP432_EXTNVM
-        
-        # else:
-        #     sys.exit("NASBase::PlatPerf: ERROR - unsupported platform cost model")
-        
+   
+
         return plat_cost_profile
 
         
@@ -82,51 +68,18 @@ class PlatPerf:
         try:
             sb_blk_choice_key = "<" + ','.join([str(c) for c in net_config]) + ">"                           
                 
-            # -- get perf for INT pow                                
-            #e2e_lat_intpow, exec_design_intpow, error_intpow = perf_model_intpow.get_inference_latency(net_obj, fixed_params=fixed_params)
+    
+            lat, exec_design_fp, _ = perf_mode_contpow.get_inference_latency(net_obj, fixed_params=fixed_params)
             
-            #if (e2e_lat_intpow == -1):
-                #return error_intpow
-                        
-            #ip_tot_npc = np.sum([l['npc'] for l in exec_design_intpow]) if e2e_lat_intpow != -1 else -1        # total power cycles
-            #ip_tot_rc = np.sum([l['L_rc_tot'] for l in exec_design_intpow]) if e2e_lat_intpow != -1 else -1    # total recharge time
-            #ip_tot_rb = np.sum([l['cost_brk']['rb'][1] * l['npc'] for l in exec_design_intpow]) if e2e_lat_intpow != -1 else -1
-                                    
-            # -- get perf for CONT pow                 
-            # cont pow performance - fixed params : same as intpow        
-            e2e_lat_contpow_fp, exec_design_contpow_fp, error_contpow_fp = perf_mode_contpow.get_inference_latency(net_obj, fixed_params=fixed_params)
-            
-            # error reporting            
-            #if any(x == -1 for x in [ip_tot_npc, ip_tot_rc, ip_tot_rb, e2e_lat_intpow]):                
-            #    error_net_perf = True
-
-            #    int_mng_cost_proportion_cpfp = -1
-            #else:
-            #    error_net_perf = False    
-
-                # Calc IMC (vs. contpow_fp)
-             #   active_time = (e2e_lat_intpow - ip_tot_rc)            
-             #   int_mng_cost_proportion_cpfp = ((active_time-e2e_lat_contpow_fp)/active_time)*100
-            
+ 
             subnet_latency_info = { 
                 "sn_cpb"  :  net_config,                                 
                 "subnet_obj": netobj_to_pyobj(net_obj),
                 
-                # perf int pow 
-                #"error_codes"  : [error_net_perf, error_intpow, error_contpow_fp],       
-                #"perf_e2e_intpow_lat": e2e_lat_intpow,
-                #"perf_exec_design_intpow": exec_design_intpow,
-                #"perf_error_intpow": error_intpow,
-                #"ip_tot_npc": ip_tot_npc,
-                
-                # perf cont pow - fixed params
-                "perf_e2e_contpow_fp_lat": e2e_lat_contpow_fp,
-                "perf_exec_design_contpow_fp": exec_design_contpow_fp,                     
+             
+                "perf_e2e_contpow_fp_lat": lat,
+                "perf_exec_design_contpow_fp": exec_design_fp,                     
                             
-                #"active_time" : active_time,
-                #"recharge_time": ip_tot_rc,
-                # proportion
-                #"imc_prop" :  int_mng_cost_proportion_cpfp,
             } 
                                         
         except Exception as e:
@@ -141,20 +94,17 @@ class PlatPerf:
         
     
     
-    def get_inference_latency(self, network, fixed_params=None, power_type=None):
+    def get_inference_latency(self, network, fixed_params=None):
         #network = self.get_network(predic_actions, model_fn_type=self.NAS_SETTINGS['MODEL_FN_TYPE']) 
         #network = get_network_obj(subnet)
         error = None
         latency = 0
         network_exec_design = []        
 
-        if not power_type:
-            power_type = self.PLAT_SETTINGS['POW_TYPE']
-        
         # exec and pres params not given, so have to find best sol
         if fixed_params == None:
         
-            sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=power_type)
+            sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
             if 'NET_ERROR' in sols:
                 print("get_inference_latency error: NET_ERROR !!! ")
                 return -1, None, sols['NET_ERROR']['error_code']
@@ -166,20 +116,20 @@ class PlatPerf:
                     print("get_inference_latency error: cannot find a feasible execution design")
                     return -1, None, sols[each_layer['name']]['error_code']
                 else:
-                    latency = latency + sols[each_layer['name']]['best_sol'][0]['Le2e']
-                    network_exec_design.append({'layer' : each_layer['name'], 
-                                                'alias' : each_layer['alias'],
-                                                'params': sols[each_layer['name']]['best_sol'][0]['params'],
-                                                'params_exec': sols[each_layer['name']]['best_sol'][0]['params_exec'],
-                                                'params_pres': sols[each_layer['name']]['best_sol'][0]['params_pres'],
-                                                'cost_brk': sols[each_layer['name']]['best_sol'][0]['cost_brk'],
-                                                'Epc' : sols[each_layer['name']]['best_sol'][0]['Epc'],
-                                                'Eu' : sols[each_layer['name']]['best_sol'][0]['Eu'],
-                                                'Le2e' : sols[each_layer['name']]['best_sol'][0]['Le2e'],
-                                                'npc' : sols[each_layer['name']]['best_sol'][0]['npc'][0],
-                                                'L_rc_tot' : sols[each_layer['name']]['best_sol'][0]['L_rc_tot'],
-                                                'vm' : sols[each_layer['name']]['best_sol'][0]['vm'],                                            
-                                                })
+                    latency = latency
+                    # network_exec_design.append({'layer' : each_layer['name'], 
+                    #                             'alias' : each_layer['alias'],
+                    #                             'params': sols[each_layer['name']]['best_sol'][0]['params'],
+                    #                             'params_exec': sols[each_layer['name']]['best_sol'][0]['params_exec'],
+                    #                             'params_pres': sols[each_layer['name']]['best_sol'][0]['params_pres'],
+                    #                             'cost_brk': sols[each_layer['name']]['best_sol'][0]['cost_brk'],
+                    #                             'Epc' : sols[each_layer['name']]['best_sol'][0]['Epc'],
+                    #                             'Eu' : sols[each_layer['name']]['best_sol'][0]['Eu'],
+                    #                             'Le2e' : sols[each_layer['name']]['best_sol'][0]['Le2e'],
+                    #                             'npc' : sols[each_layer['name']]['best_sol'][0]['npc'][0],
+                    #                             'L_rc_tot' : sols[each_layer['name']]['best_sol'][0]['L_rc_tot'],
+                    #                             'vm' : sols[each_layer['name']]['best_sol'][0]['vm'],                                            
+                    #                             })
             
             return latency, network_exec_design, error
         
@@ -187,19 +137,19 @@ class PlatPerf:
             # exec and pres params given
                    
             for lix, each_layer in enumerate(network): 
-                cost_stats = find_layer_cost_fixed_solution(each_layer, fixed_params[lix], self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=power_type)
+                cost_stats = find_layer_cost_fixed_solution(each_layer, fixed_params[lix], self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
                 if cost_stats['Le2e'] != None:
                     latency = latency + cost_stats['Le2e']
-                    network_exec_design.append({'layer' : each_layer['name'], 'alias' : each_layer['alias'],
-                                                'params': fixed_params[lix]['params'],
-                                                'params_exec': fixed_params[lix].get('params_exec'),
-                                                'params_pres': fixed_params[lix].get('params_pres'),
-                                                'cost_brk': cost_stats['cost_brk'],
-                                                'Epc' : cost_stats['Epc'], 'Eu' : cost_stats['Eu'], 
-                                                'Le2e' : cost_stats['Le2e'], 'npc' : cost_stats['npc'][0], 
-                                                'L_rc_tot' : cost_stats['L_rc_tot'],
-                                                'vm' : cost_stats['vm'],                                            
-                                                })
+                    # network_exec_design.append({'layer' : each_layer['name'], 'alias' : each_layer['alias'],
+                    #                             'params': fixed_params[lix]['params'],
+                    #                             'params_exec': fixed_params[lix].get('params_exec'),
+                    #                             'params_pres': fixed_params[lix].get('params_pres'),
+                    #                             'cost_brk': cost_stats['cost_brk'],
+                    #                             'Epc' : cost_stats['Epc'], 'Eu' : cost_stats['Eu'], 
+                    #                             'Le2e' : cost_stats['Le2e'], 'npc' : cost_stats['npc'][0], 
+                    #                             'L_rc_tot' : cost_stats['L_rc_tot'],
+                    #                             'vm' : cost_stats['vm'],                                            
+                    #                             })
                 else:
                     print("get_inference_latency error: cost_stats is none")
                     return -1, None, cost_stats['reason']
@@ -215,7 +165,7 @@ class PlatPerf:
         
         # exec and pres params not given, so have to find best sol
         if fixed_params == None and not layer_based_cals:
-            sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'])
+            sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
             for each_layer in network: 
                 # if any one of the layers do not have a best solution, then return -1
                 if sols[each_layer['name']]['best_sol'] == None: # cannot find a feasible execution design
@@ -227,7 +177,7 @@ class PlatPerf:
                                 'params': sols[each_layer['name']]['best_sol'][0]['params'],
                                 }
                     network_exec_design.append(solution)
-                layer_flops = find_layer_flops_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'], layer_based_cals=layer_based_cals)
+                layer_flops = find_layer_flops_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, layer_based_cals=layer_based_cals)
                 #print("no sol, layer_flops: ", layer_flops)
                 network_flops.append(layer_flops)
 
@@ -244,25 +194,14 @@ class PlatPerf:
                     solution['params'] = fixed_params[lix]['params']
                 else:
                     solution['params'] = None
-                layer_flops = find_layer_flops_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'], layer_based_cals=layer_based_cals)
+                layer_flops = find_layer_flops_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, layer_based_cals=layer_based_cals)
                 #print("with sol, layer_flops: ", layer_flops)
                 network_exec_design.append(solution)
                 network_flops.append(layer_flops)
             return network_flops, network_exec_design, error
         
         
-    
-    def get_network_data_access_cost(self, predic_actions, network_exec_design):
-        network = self.get_network(predic_actions, model_fn_type=self.NAS_SETTINGS['MODEL_FN_TYPE']) 
-        error = None
-        latency = 0 
-        
-        net_cost = []
-        for lix, each_layer in enumerate(network):
-            exec_design = network_exec_design[lix]
-            [rd_cost_L, wr_cost_L, rd_cost_E, wr_cost_E] = get_layer_data_access_cost(each_layer, exec_design, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type='INT')
-            net_cost.append([rd_cost_L, wr_cost_L, rd_cost_E, wr_cost_E])
-        return net_cost
+
 
     def get_vm_usage(self, network, fixed_params=None) -> Tuple[bool, List, List, Any]:
 
@@ -275,7 +214,7 @@ class PlatPerf:
         if fixed_params == None:
             if self.PLAT_SETTINGS['LAT_E2E_REQ'] > 0:
                 # need the best solution for latency constraint
-                sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'])
+                sols = find_best_solution(network, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
             else:
                 # if only memory constraints are considered, only the smallest tile size should be checked, not the best one
                 sols = get_minimum_solution(network)
@@ -293,7 +232,7 @@ class PlatPerf:
                                 'params': sols[each_layer['name']]['best_sol'][0]['params'],
                                 }
                     network_exec_design.append(solution)
-                layer_vm_usage = find_layer_vm_usage_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'])
+                layer_vm_usage = find_layer_vm_usage_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
 
                 cur_layer_fit_vm = layer_vm_usage[0]
                 all_layers_fit_vm = all_layers_fit_vm and cur_layer_fit_vm
@@ -311,7 +250,7 @@ class PlatPerf:
                             }
                 solution['params'] = fixed_params[lix]['params']
                 network_exec_design.append(solution)
-                layer_vm_usage = find_layer_vm_usage_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE, power_type=self.PLAT_SETTINGS['POW_TYPE'])
+                layer_vm_usage = find_layer_vm_usage_fixed_solution(each_layer, solution, self.PLAT_SETTINGS, self.PLAT_COST_PROFILE)
 
                 cur_layer_fit_vm = layer_vm_usage[0]
                 all_layers_fit_vm = all_layers_fit_vm and cur_layer_fit_vm
@@ -328,30 +267,13 @@ class PlatPerf:
     @classmethod
     def get_latency_info(cls, net_obj, net_config, fixed_params=None):
 
-        #global_settings_intpow = SettingsINTpow() # default settings
-        global_settings_contpow = SettingsCONTpow() # default settings
+        global_settings_plat = Settingsplat() # default settings
 
-        #performance_model_intpow = PlatPerf(global_settings_intpow.NAS_SETTINGS_GENERAL, global_settings_intpow.PLATFORM_SETTINGS)
-        performance_model_contpow = PlatPerf(global_settings_contpow.NAS_SETTINGS_GENERAL, global_settings_contpow.PLATFORM_SETTINGS)
+        performance_model_plat = PlatPerf(global_settings_plat.NAS_SETTINGS_GENERAL, global_settings_plat.PLATFORM_SETTINGS)
 
-        subnet_latency_info = cls.get_inference_latency_verbose(performance_model_contpow, net_obj, net_config, fixed_params=fixed_params)
+        subnet_latency_info = cls.get_inference_latency_verbose(performance_model_plat, net_obj, net_config, fixed_params=fixed_params)
 
         return subnet_latency_info
-
-    @classmethod
-    def get_imc(cls, net_obj, net_config):
-        subnet_latency_info = cls.get_latency_info(net_obj, net_config)
-
-        if subnet_latency_info:
-            return subnet_latency_info['imc_prop']
-        else:
-            return -1
-
-
-
-
-
-
 
 
 # convert exec design into string

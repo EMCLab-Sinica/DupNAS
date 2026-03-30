@@ -7,7 +7,7 @@ def sample_blk_choice_str(sample):
 def debug_get_net_info(parent):
     info = {}
 
-    acc, config, efficiency = parent #, imc
+    acc, config, efficiency = parent
 
     # latency?
     info['config'] = config

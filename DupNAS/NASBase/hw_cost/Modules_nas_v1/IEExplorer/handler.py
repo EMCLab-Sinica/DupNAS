@@ -7,8 +7,7 @@ import inspect
 #sys.path.append('..')
 from ..CostModel import cnn as cnn
 from ..CostModel import common as common 
-from .explore_intpow import get_energy_all_params_intpow, explore_full_param_sweep_intpow, get_le2e_fixed_params_intpow, get_flops_fixed_params_intpow, get_data_access_layer_intpow, get_vm_usage_fixed_params_intpow
-from .explore_contpow import get_energy_all_params_contpow, explore_full_param_sweep_contpow, get_le2e_fixed_params_contpow, get_flops_fixed_params_contpow, get_vm_usage_fixed_params_contpow
+from .explore_contpow import explore_full_param_sweep_contpow, get_le2e_fixed_params_contpow, get_flops_fixed_params_contpow, get_vm_usage_fixed_params_contpow
 
 
 
@@ -67,7 +66,7 @@ def _check_layer(layer):
 # Query E2E latency / cost
 ############################################################################
 # given a specific exec + pres solution, find end-to-end latency
-def find_layer_cost_fixed_solution(layer, solution, plat_settings, plat_cost_profile, power_type='INT'):
+def find_layer_cost_fixed_solution(layer, solution, plat_settings, plat_cost_profile):
     cost_stats_per_layer = None    
         
     #print ("------- Finding Lat E2E for : %s" % layer['name'])
@@ -83,44 +82,15 @@ def find_layer_cost_fixed_solution(layer, solution, plat_settings, plat_cost_pro
         print(params_exec)
         
         # find cost stats
-        if power_type == 'INT':
-            cost_stats = get_le2e_fixed_params_intpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile)              
-        elif power_type == 'CHK_PASS_ATOMICITY':
-            cost_stats = get_le2e_fixed_params_contpow(layer,  params_exec, params_pres, plat_settings, plat_cost_profile)              
-        else:
-            sys.exit(inspect.currentframe().f_code.co_name+"::Error - unknown power type, " + power_type)
+        cost_stats = get_le2e_fixed_params_contpow(layer,  params_exec, params_pres, plat_settings, plat_cost_profile)              
         
         return cost_stats
         
     else:
         sys.exit(inspect.currentframe().f_code.co_name+"::Error - solution is None")
-    
-
-def get_layer_data_access_cost(layer, solution, plat_settings, plat_cost_profile, power_type='INT'):
-    cost_per_layer = {}    
-    _check_layer(layer)
-    if solution['params'] != None:
-        Kh = layer['K'].h; Kw = layer['K'].w
-        stride = layer['stride']
-        Tr, Tc, Tm, Tn, reuse_sch, S = common.string_to_params_all(solution['params'])
-        Tri, Tci = common._calc_conv_ifm_tile_size(Tr, Tc, Kh, Kw)
-        params_exec = {'tile_size': [Kh, Kw, Tri, Tci, Tr, Tc, Tm, Tn], 'inter_lo': reuse_sch}
-        params_pres = {'backup_batch_size': S}
-
-        tot_data_rd_cost_L, tot_data_wr_cost_L, tot_data_rd_cost_E, tot_data_wr_cost_E = get_data_access_layer_intpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile)
-
-        return tot_data_rd_cost_L, tot_data_wr_cost_L, tot_data_rd_cost_E, tot_data_wr_cost_E
-    
-    else:
-        sys.exit(inspect.currentframe().f_code.co_name+"::Error - solution is None")
 
 
-        
-def find_layer_imc_fixed_solution():
-    # TODO
-    raise NotImplementedError
-
-def find_layer_flops_fixed_solution(layer, solution, plat_settings, plat_cost_profile, power_type='INT', layer_based_cals=False):
+def find_layer_flops_fixed_solution(layer, solution, plat_settings, plat_cost_profile, layer_based_cals=False):
     # follow the same format of find_layer_cost_fixed_solution above
     _check_layer(layer)
 
@@ -134,19 +104,15 @@ def find_layer_flops_fixed_solution(layer, solution, plat_settings, plat_cost_pr
             Tri = Tci = None
         params_exec = {'tile_size': [Kh, Kw, Tri, Tci, Tr, Tc, Tm, Tn], 'inter_lo': reuse_sch}
         params_pres = {'backup_batch_size': S}
-        if power_type == 'INT':
-            flops_stats, _ = get_flops_fixed_params_intpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile, layer_based_cals)
-        elif power_type == 'CONT':
-            flops_stats, _ = get_flops_fixed_params_contpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile, layer_based_cals)
-        else:
-            sys.exit(inspect.currentframe().f_code.co_name+"::Error - unknown power type, " + power_type)
+      
+        flops_stats, _ = get_flops_fixed_params_contpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile, layer_based_cals)
 
         return flops_stats
 
     else:
         sys.exit(inspect.currentframe().f_code.co_name+"::Error - solution is None")
         
-def find_layer_vm_usage_fixed_solution(layer, solution, plat_settings, plat_cost_profile, power_type='INT'):
+def find_layer_vm_usage_fixed_solution(layer, solution, plat_settings, plat_cost_profile):
     # follow the same format of find_layer_cost_fixed_solution above
     _check_layer(layer)
 
@@ -156,12 +122,7 @@ def find_layer_vm_usage_fixed_solution(layer, solution, plat_settings, plat_cost
         Tri, Tci = common._calc_conv_ifm_tile_size(Tr, Tc, Kh, Kw, stride = layer['stride'], layer_type = layer['type'])
         params_exec = {'tile_size': [Kh, Kw, Tri, Tci, Tr, Tc, Tm, Tn], 'inter_lo': reuse_sch}
         params_pres = {'backup_batch_size': S}
-        if power_type == 'INT':
-            vm_usage_stats = get_vm_usage_fixed_params_intpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile)
-        elif power_type == 'CONT':
-            vm_usage_stats = get_vm_usage_fixed_params_contpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile)
-        else:
-            sys.exit(inspect.currentframe().f_code.co_name+"::Error - unknown power type, " + power_type)
+        vm_usage_stats = get_vm_usage_fixed_params_contpow(layer, params_exec, params_pres, plat_settings, plat_cost_profile)
 
         return vm_usage_stats
 
@@ -172,21 +133,9 @@ def find_layer_vm_usage_fixed_solution(layer, solution, plat_settings, plat_cost
 ############################################################################
 # Explorer Handlers
 ############################################################################
-def find_energy_all_solutions(network, plat_settings, plat_cost_profile):
-    sol_per_layer = []    
-    for each_layer in network: 
-        _check_layer(each_layer)
-
-        all_sols = get_energy_all_params_intpow(each_layer, plat_settings, plat_cost_profile)                
-        sol_per_layer[each_layer['name']] = {
-            'all_sols': all_sols,
-        }
-    
-    return sol_per_layer
 
 
-
-def find_best_solution(network, plat_settings, plat_cost_profile, power_type='CONT', cost_breakdown=False):
+def find_best_solution(network, plat_settings, plat_cost_profile, cost_breakdown=False):
     #print("------- Finding the best solution...")
 
     sol_per_layer = {}    
@@ -207,12 +156,8 @@ def find_best_solution(network, plat_settings, plat_cost_profile, power_type='CO
         _check_layer(each_layer)
 
         best_solution=None; pass_solutions=None; fail_solutions=None
-        if power_type == 'INT': # INT power
-            best_solution, pass_solutions, fail_solutions_c0, fail_solutions_c1, pass_topN = explore_full_param_sweep_intpow(each_layer, plat_settings, plat_cost_profile)                
-        elif power_type == 'CONT': # CONT power
-            best_solution, pass_solutions, fail_solutions_c0, fail_solutions_c1, pass_topN = explore_full_param_sweep_contpow(each_layer, plat_settings, plat_cost_profile)                
-        else:
-            sys.exit(inspect.currentframe().f_code.co_name+"::Error - Unknown power type "+power_type)
+        best_solution, pass_solutions, fail_solutions_c0, fail_solutions_c1, pass_topN = explore_full_param_sweep_contpow(each_layer, plat_settings, plat_cost_profile)                
+
                 
         if best_solution == None or not res_cons_c2[0]:   # no solution found                        
             sol_per_layer[each_layer['name']] = {

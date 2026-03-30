@@ -52,8 +52,6 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
     print("CPUID [%d] :: Enter : has %d jobs " % (cpuid, len(subnet_config_list)))
     
     print("Starting processes for width_multiplier={}, input_resolution={}..".format(width_multiplier, input_resolution))
-
-    print("----> " , global_settings.PLATFORM_SETTINGS["POW_TYPE"])
     
     # init
     subnet_name="UNKNOWN_SUBNET";subnet_cpb=[];subnet_obj=[]
@@ -553,24 +551,24 @@ def calc_flops_for_supernet(global_settings, dataset, supernet, width_multiplier
     ts_goal = global_settings.NAS_SETTINGS_GENERAL['GOAL']
     txt_name = f"{ts_mode}_{ts_goal}_w{width_multiplier}_ir{input_resolution}_check_per_supernet.txt"
 
-    with open(txt_name, "w", encoding="utf-8") as file:
-        for per_cpu_rst in all_check_sp_results:       # List for each CPU
-            for per_rst in per_cpu_rst:               # Each result dict
-                file.write(
-                    f"subnet: {per_rst['id']}, "
-                    f"ori_peak: {per_rst['oripeak']},"
-                    f"peak memory: {per_rst['mem']}, "
-                    f"flops: {per_rst['flops']}, "
-                    f"nvm: {per_rst['nvm']}, "
-                    f"under_const: {per_rst['under']}, "
-                    f"under_nvm: {per_rst['under_nvm']}, "
-                    f"ori_mac: {per_rst['ori_mac']},"
-                    f"plus_mac: {per_rst['plus_mac']},"
-                    f"ori_access: {per_rst['ori_access']},"
-                    f"plus_access: {per_rst['plus_access']},"
-                    f"cpb: {per_rst['cpb']}, "
-                    f"TS: {per_rst['TS']}\n"
-                )
+    # with open(txt_name, "w", encoding="utf-8") as file:
+    #     for per_cpu_rst in all_check_sp_results:       # List for each CPU
+    #         for per_rst in per_cpu_rst:               # Each result dict
+    #             file.write(
+    #                 f"subnet: {per_rst['id']}, "
+    #                 f"ori_peak: {per_rst['oripeak']},"
+    #                 f"peak memory: {per_rst['mem']}, "
+    #                 f"flops: {per_rst['flops']}, "
+    #                 f"nvm: {per_rst['nvm']}, "
+    #                 f"under_const: {per_rst['under']}, "
+    #                 f"under_nvm: {per_rst['under_nvm']}, "
+    #                 f"ori_mac: {per_rst['ori_mac']},"
+    #                 f"plus_mac: {per_rst['plus_mac']},"
+    #                 f"ori_access: {per_rst['ori_access']},"
+    #                 f"plus_access: {per_rst['plus_access']},"
+    #                 f"cpb: {per_rst['cpb']}, "
+    #                 f"TS: {per_rst['TS']}\n"
+    #             )
 
     return {
         'all_subnet_results': all_subnet_results[:n],
@@ -614,17 +612,13 @@ def ss_optimization_by_flops(global_settings, dataset, supernet_choices, superne
         ret['constraint_stats']['num_subnets'] = valid_subnets
         if cur_subnet_results:
             ret['constraint_stats'].update({
-                #'imc_average': statistics.mean(subnet['imc_prop'] for subnet in cur_subnet_results),
                 'latency_average': statistics.mean(subnet['perf_e2e_contpow_fp_lat'] for subnet in cur_subnet_results),
                 'flops_average': statistics.mean(subnet['perf_e2e_contpow_flops'] for subnet in cur_subnet_results),
-#                'npc_average': statistics.mean(subnet['ip_tot_npc'] for subnet in cur_subnet_results),
-            })
+                })
         else:
             ret['constraint_stats'].update({
-                #'imc_average': None,
                 'latency_average': None,
                 'flops_average': None,
- #               'npc_average': None,
             })
 
         per_supernet_stats[f'({width_multiplier}, {input_resolution})'] = sorted_dict(ret['constraint_stats'])

@@ -56,10 +56,8 @@ def evo_search(global_settings: Settings, dataset, supernet, logfname, run_id=0,
         supernet, 
     )
 
-    #target_hardware = global_settings.PLATFORM_SETTINGS['MCU_TYPE']
     latency_constraint = global_settings.PLATFORM_SETTINGS['LAT_E2E_REQ']  
-    #imc_constraint = global_settings.PLATFORM_SETTINGS['IMC_CONSTRAINT']
-    
+     
     P = global_settings.NAS_EVOSEARCH_SETTINGS['POP_SIZE']  # The size of population in each generation
     N = global_settings.NAS_EVOSEARCH_SETTINGS['GENERATIONS']  # How many generations of population to be searched
     r = global_settings.NAS_EVOSEARCH_SETTINGS['PARENT_RATIO']  # The ratio of networks that are used as parents for next generation
@@ -68,9 +66,7 @@ def evo_search(global_settings: Settings, dataset, supernet, logfname, run_id=0,
         'exp_suffix': exp_suffix,
         'dataset' : dataset,
         'supernet': supernet,        
-        #'constraint_type': target_hardware, # Let's do FLOPs-constrained search
         'efficiency_constraint': latency_constraint,
-        #'imc_constraint': imc_constraint,
         'mutation_ratio': 0.5, # The ratio of networks that are generated through mutation in generation n >= 2.
         'efficiency_predictor': latency_estimator, # To use a predefined efficiency predictor.
         'accuracy_predictor': accuracy_predictor, # To use a predefined accuracy_predictor predictor.
@@ -96,11 +92,9 @@ def evo_search(global_settings: Settings, dataset, supernet, logfname, run_id=0,
         (latency_constraint, time_taken, best_info['accuracy'], '%', best_info['lat_contpow']))
 
     # visualize the architecture of the searched sub-net
-    #ofa_network.set_active_subnet(ks=net_config['ks'], d=net_config['d'], e=net_config['e'])
     print('Architecture of the searched sub-net:')
     pprint(best_info['subnet_choice_per_blk'])
-    #print(ofa_network.module_str)
-
+ 
     return best_valids, best_info, time_taken
 
 

@@ -12,7 +12,6 @@ from NASBase.evo_search.utils import sample_blk_choice_str
 class EvoMemTypes(enum.Enum):
     LAT     = 1
     ACC     = 2 # [val_loss, val_acc]
-    #IMC     = 3
     NVM    = 3
     VM     = 4
     

@@ -216,7 +216,7 @@ class EvolutionFinder:
 
     def __init__(self, global_settings, dataset, supernet, constraint_type, efficiency_constraint,
                  efficiency_predictor, accuracy_predictor, logfname, **kwargs):
-     #imc_constraint,
+    
         self.global_settings = global_settings
         self.dataset = dataset
         self.constraint_type = constraint_type
@@ -236,9 +236,6 @@ class EvolutionFinder:
             #self.invite_reset_constraint()
             sys.exit("EvolutionFinder::Error: Invalid constraint_value!")
 
-        #self.imc_constraint = imc_constraint
-        #if not (imc_constraint <= 100 and imc_constraint >= 0):
-        #   sys.exit("EvolutionFinder::Error: Invalid imc_constraint value!")
         
         self.efficiency_predictor = efficiency_predictor
         self.accuracy_predictor = accuracy_predictor
@@ -253,18 +250,11 @@ class EvolutionFinder:
         self.net_choices = supernet.net_choices
         _, input_resolution = self.net_choices
         self.input_resolution = input_resolution
-        #self.num_stages = self.arch_manager.num_stages
-
         # initialize caching
         self.evo_memory = EvoMem(self.global_settings.NAS_EVOSEARCH_SETTINGS, 
                                   net_choices = self.net_choices, 
                                   input_ch = self.global_settings.NAS_SETTINGS_PER_DATASET[self.dataset]['INPUT_CHANNELS'])
   
-        # evo search settings
-        # self.population_size = kwargs.get('population_size', 100)
-        # self.max_time_budget = kwargs.get('max_time_budget', 500)
-        # self.parent_ratio = kwargs.get('parent_ratio', 0.25)
-        # self.mutation_ratio = kwargs.get('mutation_ratio', 0.5)
         
         self.max_time_budget    = kwargs.get('max_time_budget', global_settings.NAS_EVOSEARCH_SETTINGS['GENERATIONS'])
         self.population_size    = kwargs.get('population_size', global_settings.NAS_EVOSEARCH_SETTINGS['POP_SIZE'])
@@ -280,30 +270,7 @@ class EvolutionFinder:
                 self.initial_population_fname = self.global_settings.LOG_SETTINGS['TRAIN_LOG_DIR'] + self.exp_suffix + '_initial_population.json'
 
 
-    # def invite_reset_constraint_type(self):
-    #   print('Invalid constraint type! Please input one of:', list(self.valid_constraint_range.keys()))
-    #   new_type = input()
-    #   while new_type not in self.valid_constraint_range.keys():
-    #       print('Invalid constraint type! Please input one of:', list(self.valid_constraint_range.keys()))
-    #       new_type = input()
-    #   self.constraint_type = new_type
 
-    # def invite_reset_constraint(self):
-    #   print('Invalid constraint_value! Please input an integer in interval: [%d, %d]!' % (
-    #       self.valid_constraint_range[self.constraint_type][0],
-    #       self.valid_constraint_range[self.constraint_type][1])
-    #         )
-
-    #   new_cons = input()
-    #   while (not new_cons.isdigit()) or (int(new_cons) > self.valid_constraint_range[self.constraint_type][1]) or \
-    #           (int(new_cons) < self.valid_constraint_range[self.constraint_type][0]):
-    #       print('Invalid constraint_value! Please input an integer in interval: [%d, %d]!' % (
-    #           self.valid_constraint_range[self.constraint_type][0],
-    #           self.valid_constraint_range[self.constraint_type][1])
-    #             )
-    #       new_cons = input()
-    #   new_cons = int(new_cons)
-    #   self.efficiency_constraint = new_cons
 
     def set_efficiency_constraint(self, new_constraint):
         self.efficiency_constraint = new_constraint
@@ -311,29 +278,22 @@ class EvolutionFinder:
     def check_constraints(self, sample):
         input_ch = self.global_settings.NAS_SETTINGS_PER_DATASET[self.dataset]['INPUT_CHANNELS']
 
-        if not self.global_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_BYPASS_EFFICIENCY']:
+        if self.global_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_BYPASS_EFFICIENCY']:
             
             # -- Results can be cached in a lookup table --
             cached_lat = self.evo_memory.query_tbl(sample, EvoMemTypes.LAT)
-            #cached_imc = self.evo_memory.query_tbl(sample, EvoMemTypes.IMC)
 
-            if None in [cached_lat]:    # if any of them are none, then recalculate  #, cached_imc
-                efficiency = self.efficiency_predictor.predict_efficiency(sample, self.net_choices, input_ch)
-            else:
-                print(f'Cache hit for {str(sample)}')
-                efficiency = cached_lat
-                #imc = cached_imc    
+            print(f'Cache hit for {str(sample)}')
+            efficiency = cached_lat
+                    
        
             if efficiency == -1 or (self.efficiency_constraint != 0 and efficiency > self.efficiency_constraint):
                 if self.debug_enabled: print(f'Skipping subnet - efficiency {efficiency} exceeds constraint {self.efficiency_constraint}')
                 sample = None  # return None to indicate something wrong
                 return None, None
-            #if imc == -1 or (self.imc_constraint != 0 and imc > self.imc_constraint):
-            #   if self.debug_enabled: print(f'Skipping subnet - IMC {imc} exceeds constraint {self.imc_constraint}')
-            #   sample = None
-            # <=== Add this line
+            
             return sample, efficiency
-             #, imc
+        
         else:
             efficiency = -1 
             print("###check_constraints###")
@@ -418,14 +378,14 @@ class EvolutionFinder:
                         efficiency = 1
                         self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                         self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
-                        return sample, efficiency # imc
+                        return sample, efficiency 
                     else:
                         if self.debug_enabled: print('Skipping subnet - not all layers fit NVM or VM')
                         print("original mem over constraint! ") #skip subnet, over constraint
                         self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                         self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
                 
-                        return None, None #, imc
+                        return None, None 
 
 
             except Exception as e:
@@ -433,24 +393,15 @@ class EvolutionFinder:
                 import traceback
                 print(f"[check_constraints] error: {e}\n{traceback.format_exc(limit=3)}")
                 return None, None
-            # if cached_nvm_fit != None: # use cached value
-            #     all_layers_fit_nvm = cached_nvm_fit
-            # else: # recalculate
-            #     all_layers_fit_nvm = self.efficiency_predictor.predict_nvm_usage(sample, self.net_choices)
-    
-            #if all_layers_fit_nvm and under_mem:
-            #    return sample, efficiency # imc
-            # else:
-            #     if self.debug_enabled: print('Skipping subnet - not all layers fit NVM or VM')
-            #     return None, efficiency #, imc
+
 
     def random_sample(self):
         trials = 0
         while trials < 100:
             sample = self.arch_manager.random_sample()
-            sample, efficiency = self.check_constraints(sample) #, imc
+            sample, efficiency = self.check_constraints(sample) 
             if sample:
-                return sample, efficiency #, imc
+                return sample, efficiency 
             trials += 1
             print(f'random_sample: retry {trials}')
         return None, None
@@ -476,9 +427,9 @@ class EvolutionFinder:
                 sys.exit("mutate_sample::Error: Invalid mutation operator!")
             
             # this mutation is only accepted if it passes the efficiency constraint
-            new_sample, efficiency = self.check_constraints(new_sample)  #, imc
+            new_sample, efficiency = self.check_constraints(new_sample) 
             if new_sample:
-                return new_sample, efficiency#, imc
+                return new_sample, efficiency
 
 
     def crossover_sample(self, sample1, sample2):     
@@ -493,28 +444,13 @@ class EvolutionFinder:
             for bix, blk in enumerate(sample1):
                 new_sample[bix] = random.choice([sample1[bix], sample2[bix]])
        
-            new_sample, efficiency = self.check_constraints(new_sample) #, imc
+            new_sample, efficiency = self.check_constraints(new_sample)
             if new_sample:
-                return new_sample, efficiency #, imc
+                return new_sample, efficiency 
 
         print("[crossover_sample] failed after 100 attempts, parents incompatible")
         print(" parent1_len =", len(sample1), " parent2_len =", len(sample2))
         return None, None
-
-    # def crossover_sample(self, sample1, sample2):     
-    #   constraint = self.efficiency_constraint
-    #   while True:
-    #       new_sample = copy.deepcopy(sample1)
-    #       for key in new_sample.keys():
-    #           if not isinstance(new_sample[key], list):
-    #               continue
-    #           for i in range(len(new_sample[key])):
-    #               new_sample[key][i] = random.choice([sample1[key][i], sample2[key][i]])
-
-    #       efficiency = self.efficiency_predictor.predict_efficiency(new_sample)
-    #       if efficiency <= constraint:
-    #           return new_sample, efficiency
-
 
 
     
@@ -547,37 +483,7 @@ class EvolutionFinder:
             print(f"Need {population_size} subnets, got {processed}")
             if processed >= population_size:
                 break
-    # def _mpworker_pop_efficiency(self, worker_id, population_size, q, processed_subnets):
-    #     print("_mpworker_pop_efficiency::Enter [{}]".format(worker_id))
-    #     child_pool = []
-    #     efficiency_pool = []
-    #     #imc_pool = []
-    #     while True:
-    #         sample, efficiency= self.check_constraints(self.arch_manager.random_sample())
-    #         if sample is not None:
-    #             child_pool.append(sample); efficiency_pool.append(efficiency)
-    #             q.put((sample, efficiency))
-    #             with processed_subnets.get_lock():
-    #                 processed_subnets.value += 1
-    #         #print("_mpworker_pop_efficiency::Enter [{}][{}/{}]".format(worker_id, pix+1, batched_pop_size))
-    #         with processed_subnets.get_lock():
-    #             processed_subnets_value = processed_subnets.value
-    #         print(f'Need {population_size} subnets, got {processed_subnets_value}')
-    #         if processed_subnets_value >= population_size:
-    #             break
-
-        # for pix in range(batched_pop_size):
-        #     sample, efficiency = self.random_sample()  #, imc
-        #     if sample is None:
-        #         break
-        #     child_pool.append(sample); efficiency_pool.append(efficiency) #; imc_pool.append(imc)
-        #     #print("_mpworker_pop_efficiency::Enter [{}][{}/{}]".format(worker_id, pix+1, batched_pop_size))
-        # result = {
-        #     "child_pool" : child_pool,
-        #     "efficiency_pool" : efficiency_pool,
-        #     #"imc_pool": imc_pool,
-        # }  
-        # return result
+   
 
     def _mpworker_pop_accuracy(self, worker_id, batched_child_pool):
         print("_mpworker_pop_accuracy::Enter [{}], num_jobs={}".format(worker_id, len(batched_child_pool)))
@@ -614,18 +520,18 @@ class EvolutionFinder:
         print("_mpworker_pop_mutate::Enter [{}], num_jobs={}".format(worker_id, batched_mutation_numbers))
         child_pool = []
         efficiency_pool = []
-        #imc_pool = []
+
         for i in range(batched_mutation_numbers):
             par_sample = population[np.random.randint(parents_size)][1]
             
             # Mutate
-            new_sample, efficiency = self.mutate_sample(par_sample) #, imc
+            new_sample, efficiency = self.mutate_sample(par_sample)
             if new_sample:
-                child_pool.append(new_sample); efficiency_pool.append(efficiency) #; imc_pool.append(imc)
+                child_pool.append(new_sample); efficiency_pool.append(efficiency)
             print("_mpworker_pop_mutate::Enter [{}][{}/{}]".format(worker_id, i+1, batched_mutation_numbers))
         
         result = {
-                "child_pool" : child_pool, "efficiency_pool" : efficiency_pool, #"imc_pool": imc_pool,
+                "child_pool" : child_pool, "efficiency_pool" : efficiency_pool
         }  
         return result
 
@@ -644,18 +550,19 @@ class EvolutionFinder:
         print("_mpworker_pop_crossover::Enter [{}], num_jobs={}".format(worker_id, batched_crossover_numbers))
         child_pool = []
         efficiency_pool = []
-        #imc_pool = []
+
         for i in range(batched_crossover_numbers):
             par_sample1 = population[np.random.randint(parents_size)][1]    # could this give two identical parents ?
             par_sample2 = population[np.random.randint(parents_size)][1]
 
             # Crossover
-            new_sample, efficiency = self.crossover_sample(par_sample1, par_sample2)  #, imc
+            new_sample, efficiency = self.crossover_sample(par_sample1, par_sample2)  
+
             if new_sample:
-                child_pool.append(new_sample); efficiency_pool.append(efficiency) #; imc_pool.append(imc)
+                child_pool.append(new_sample); efficiency_pool.append(efficiency) 
             #print("_mpworker_pop_crossover::Enter [{}][{}/{}]".format(worker_id, i+1, batched_crossover_numbers))
         result = {
-                "child_pool" : child_pool, "efficiency_pool" : efficiency_pool,# "imc_pool": imc_pool,
+                "child_pool" : child_pool, "efficiency_pool" : efficiency_pool,
         }  
         return result
     
@@ -665,8 +572,8 @@ class EvolutionFinder:
     def log_progress(self, iteration, population):
         best_subnet = population[0]
         worst_subnet = population[-1]
-        best_acc, _, best_efficiency= best_subnet  #, best_imc 
-        worst_acc, _, worst_efficiency = worst_subnet  #, worst_imc
+        best_acc, _, best_efficiency= best_subnet  
+        worst_acc, _, worst_efficiency = worst_subnet  
         best_info_dict = debug_get_net_info(best_subnet)
         worst_info_dict = debug_get_net_info(worst_subnet)
         best_score = self.get_score(best_subnet)
@@ -674,9 +581,9 @@ class EvolutionFinder:
 
         #pprint(population)
   
-        field_names = ["iter", "best_score", "worst_score", "best_acc", "worst_acc", "best_efficiency", "worst_efficiency", "best_config", "worst_config", "uniq"] #"best_imc", "worst_imc",
+        field_names = ["iter", "best_score", "worst_score", "best_acc", "worst_acc", "best_efficiency", "worst_efficiency", "best_config", "worst_config", "uniq"] 
         field_values = [iteration, best_score, worst_score, best_acc, worst_acc, best_efficiency, worst_efficiency, best_info_dict["config"], worst_info_dict["config"], self.calc_unique_subnets(population)]
-        assert len(field_names) == len(field_values)  #best_imc, worst_imc,
+        assert len(field_names) == len(field_values)  
 
         logger = utils.CsvLogger((self.global_settings.LOG_SETTINGS['TRAIN_LOG_DIR'] +
                                   self.exp_suffix + "_evo_search.csv"),
@@ -709,7 +616,7 @@ class EvolutionFinder:
             field_names = ["iter", "mutation_sec", "crossover_sec", "pop_acc_sec"]
             field_values = [iteration, mutation_sec, crossover_sec, pop_acc_sec]
         
-        assert len(field_names) == len(field_values)  #best_imc, worst_imc,
+        assert len(field_names) == len(field_values) 
 
         logger = utils.CsvLogger((self.global_settings.LOG_SETTINGS['TRAIN_LOG_DIR'] +
                                   self.exp_suffix + "_evo_search_tstime.csv"),
@@ -717,19 +624,14 @@ class EvolutionFinder:
         logger.log(field_values)
  
     def get_score(self, item):
-        acc, child, efficiency = item  #, imc
+        acc, child, efficiency = item 
         score_type = self.global_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_SCORE_TYPE']
 
         Lreq = self.global_settings.PLATFORM_SETTINGS['LAT_E2E_REQ']
 
-        if score_type == 'ACC_IMC':
-            return acc * (1/imc)
-        elif score_type == 'ACC':
+        
+        if score_type == 'ACC':
             return acc
-        elif score_type == 'ACC_IMO_LREQ':
-            return acc * (1/imc) * (efficiency/Lreq)
-        elif score_type == 'ACC_LREQ':
-            return acc * (efficiency/Lreq)
         else:
             sys.exit("get_score: Invalid score type!")
 
@@ -742,10 +644,9 @@ class EvolutionFinder:
     def init_population(self, verbose=False):
         population_size = self.population_size 
 
-        population = []  # (validation, sample, latency, imc) tuples
+        population = []  # (validation, sample, latency) tuples
         child_pool = []
         efficiency_pool = []
-        #imc_pool = []
         if verbose:
             print('Generate random population...')
     
@@ -770,26 +671,13 @@ class EvolutionFinder:
             while not ctx.join():
                 pass
 
-            # if (population_size % num_workers) > 0:
-            #     sys.exit("run_evolution_search::Error - init get latency - non divisible num workers: {},{}".format(num_workers, population_size))
-            # batched_pop_size = int(np.ceil(population_size/num_workers))            
-            # all_worker_results = mp_helper.run_multiprocessing_workers(
-            #     num_workers=num_workers,
-            #     worker_func= self._mpworker_pop_efficiency,
-            #     worker_type='CPU',
-            #     common_args=(batched_pop_size,), worker_args=(),
-            # )           
-            # # combine results
-            # for worker_result in all_worker_results:
-            #     child_pool.extend(worker_result['child_pool'])
-            #     efficiency_pool.extend(worker_result['efficiency_pool'])
-                #imc_pool.extend(worker_result['imc_pool'])
+
         else:  
             for pix in range(population_size):
-                sample, efficiency = self.random_sample()  #, imc
+                sample, efficiency = self.random_sample() 
                 child_pool.append(sample)
                 efficiency_pool.append(efficiency)
-                #imc_pool.append(imc)
+
     
         child_pool = list(filter(None, child_pool))
         if len(child_pool) < population_size:
@@ -827,18 +715,18 @@ class EvolutionFinder:
 
         # -- create population
         for pix in range(population_size):
-            population.append([accs[pix], child_pool[pix], efficiency_pool[pix]])  #,imc_pool[pix]
+            population.append([accs[pix], child_pool[pix], efficiency_pool[pix]])  
   
         
         #self._debug_dump_pop_info(population)
 
         # -- update evo mem
-        for sample, lat, acc in zip(child_pool, efficiency_pool, accs):  #, imc, , imc_pool
+        for sample, lat, acc in zip(child_pool, efficiency_pool, accs): 
             self.evo_memory.update_tbl_multival(sample, 
                                                 [EvoMemTypes.LAT,  EvoMemTypes.ACC], 
                                                 [lat, acc]
                                                 )
-            #EvoMemTypes.IMC,imc,
+
 
         return population, lat_total_sec, acc_total_sec
 
@@ -1129,7 +1017,7 @@ class EvolutionFinder:
         # ========================= INITIALIZE RANDOM POPULATION
         self.best_valids = best_valids = [-100]
         best_info = None
-        population = []  # (validation, sample, latency, imc) tuples
+        population = []  # (validation, sample, latency) tuples
 
         init_time = [] #init_lat_total_sec, init_acc_total_sec,
         # TODO: load initial population from dump_pop
@@ -1191,7 +1079,7 @@ class EvolutionFinder:
             population = parents    # parents are top N candidates in this population
             child_pool = []
             efficiency_pool = []
-            #imc_pool = []
+   
    
             # ========================= MUTATION
             # mutate a fixed number of random candidates (### MULTIPROCESSING: CPU)
@@ -1215,7 +1103,6 @@ class EvolutionFinder:
                 for worker_result in all_worker_results:
                     child_pool.extend(worker_result['child_pool'])
                     efficiency_pool.extend(worker_result['efficiency_pool'])
-                    #imc_pool.extend(worker_result['imc_pool'])
             else:
                 actual_pop_size = len(population)
                 if actual_pop_size == 0 or parents_size == 0:
@@ -1231,22 +1118,22 @@ class EvolutionFinder:
                 for i in range(mutation_numbers):
                     par_sample = population[np.random.randint(parents_size)][1]                 
                     # Mutate
-                    new_sample, efficiency = self.mutate_sample(par_sample) #, imc
+                    new_sample, efficiency = self.mutate_sample(par_sample) 
                     child_pool.append(new_sample)
                     efficiency_pool.append(efficiency)
-                    #imc_pool.append(imc)
+                   
 
             t_mut_end = time.perf_counter()
             mutation_sec = t_mut_end - t_mut_start
             evo_time.append(mutation_sec)
 
             # -- update evo mem
-            for sample, lat in zip(child_pool, efficiency_pool): #, imc
+            for sample, lat in zip(child_pool, efficiency_pool): 
                 self.evo_memory.update_tbl_multival(sample, 
                                                     [EvoMemTypes.LAT],
                                                     [lat]
                                                     )
-            #, EvoMemTypes.IMC , imc, , imc_pool
+            
             
             # ========================= CROSSOVER
             # ---------- crossover a fixed number of random candidates  (### MULTIPROCESSING: CPU)
@@ -1274,7 +1161,6 @@ class EvolutionFinder:
                 for worker_result in all_worker_results:
                     child_pool.extend(worker_result['child_pool'])
                     efficiency_pool.extend(worker_result['efficiency_pool'])
-                    #imc_pool.extend(worker_result['imc_pool'])
             else:
                 actual_pop_size = len(population)
                 if actual_pop_size == 0 or parents_size == 0:
@@ -1292,17 +1178,16 @@ class EvolutionFinder:
                     par_sample2 = population[np.random.randint(parents_size)][1]
         
                     # Crossover
-                    new_sample, efficiency = self.crossover_sample(par_sample1, par_sample2) #, imc
+                    new_sample, efficiency = self.crossover_sample(par_sample1, par_sample2) 
                     child_pool.append(new_sample)
                     efficiency_pool.append(efficiency)
-                    #imc_pool.append(imc)
 
 
             t_cross_end = time.perf_counter()
             crossover_sec = t_cross_end - t_cross_start
             evo_time.append(crossover_sec)
 
-            # -- update evo mem   #, imc, imc_pool, EvoMemTypes.IMC, imc
+            # -- update evo mem  
             for sample, lat in zip(child_pool, efficiency_pool):
                 self.evo_memory.update_tbl_multival(sample, 
                                                     [EvoMemTypes.LAT],
@@ -1349,57 +1234,13 @@ class EvolutionFinder:
 
 
             for i in range(population_size):
-                population.append([accs[i], child_pool[i], efficiency_pool[i]])  #, imc_pool[i]
+                population.append([accs[i], child_pool[i], efficiency_pool[i]]) 
                 # log best and worst accs at the end of the generation
     
                 # -- update evo mem
                 self.evo_memory.update_tbl(child_pool[i], EvoMemTypes.ACC, accs[i])
 
-                # -- print out
-                     
-                
-                # max_features = self.evo_memory.query_tbl(sample, EvoMemTypes.NVM)
-                # peak_for_all = self.evo_memory.query_tbl(sample, EvoMemTypes.VM)
-                # cached_nvm_fit = self.evo_memory.query_tbl(sample, EvoMemTypes.NVM_FIT)
-                # under_mem = self.evo_memory.query_tbl(sample, EvoMemTypes.VM_FIT)
-                # ori_mac = self.evo_memory.query_tbl(sample, EvoMemTypes.MAC)
-                # ori_access = self.evo_memory.query_tbl(sample, EvoMemTypes.ACCESS)
-                # plus_mac = self.evo_memory.query_tbl(sample, EvoMemTypes.P_MAC)
-                # plus_access = self.evo_memory.query_tbl(sample, EvoMemTypes.P_ACCESS)
-
-                # per_child['idx'] = i
-                # per_child['child'] = child_pool[i]
-                # per_child['under_mem'] = under_mem
-                # per_child['peak_after_ts'] = peak_for_all
-                # per_child['ori_mac'] = ori_mac
-                # per_child['plus_mac'] = plus_mac
-                # per_child['ori_access'] = ori_access
-                # per_child['plus_access'] = plus_access
-                # per_child['max_features'] = max_features
-                # per_child['under_nvm'] = cached_nvm_fit
-
-                # check_per_child.append(per_child)
-
-    
             cur_logfname = self.logfname.replace('.json', f'-{self.run_id}-gen{iter}.json')
-
-            # print("Export child info with TS") 
-            # ts_mode = self.global_settings.NAS_SETTINGS_GENERAL['MODE']
-            # txt_name = f"{ts_mode}_Iter-{iter}_check_per_child_ts_in_evo.txt"
-            # with open(txt_name, "w", encoding="utf-8") as file:
-            #     for per_rst in check_per_child:       # List for each CPU
-            #         file.write(
-            #             f"subnet: {per_rst['idx']}, "
-            #             f"ori_peak: {per_rst['oripeak']},"
-            #             f"peak_after_ts: {per_rst['peak_after_ts']}, "
-            #             f"nvm: {per_rst['max_features']}, "
-            #             f"under_const: {per_rst['under_mem']}, "
-            #             f"under_nvm: {per_rst['under_nvm']}, "
-            #             f"ori_mac: {per_rst['ori_mac']},"
-            #             f"plus_mac: {per_rst['plus_mac']},"
-            #             f"ori_access: {per_rst['ori_access']},"
-            #             f"plus_access: {per_rst['plus_access']},"
-            #             f"cpb: {per_rst['child']} \n")
 
             best_info_dict = self.get_metadata_for_best_solution(best_info)
 
@@ -1426,7 +1267,7 @@ class EvolutionFinder:
         return best_valids, best_info_dict
 
     def get_metadata_for_best_solution(self, best_info):
-        acc, child, efficiency = best_info #, imc
+        acc, child, efficiency = best_info 
 
         subnet_latency_info = self.efficiency_predictor.predict_network_latency_verbose(child, self.net_choices)
         print("subnet_latency_info:", subnet_latency_info)  # Debugging output
@@ -1456,9 +1297,7 @@ class EvolutionFinder:
             "subnet_latency_info": subnet_latency_info,
             "network_nvm_usage": network_nvm_usage,
             "lat_contpow": efficiency,
-            # "lat_contpow": xxx,
             "accuracy": acc,
-            #"imc": imc,
             "score": self.get_score(best_info),
         }
     

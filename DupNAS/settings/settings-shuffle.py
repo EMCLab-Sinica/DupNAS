@@ -96,8 +96,6 @@ class Stages(IntEnum):
 
 class SSOptPolicy(str, Enum):
     FLOPS = 'FLOPS'
-    IMC = 'IMC'
-    #OURS = 'OURS'
 
 SETTINGS_CATEGORIES = (
     'GLOBAL_SETTINGS',
@@ -142,40 +140,17 @@ class Settings(object): ##default settintgs & discription
     # PLATFORM SPECIFIC SETTINGS
     # ----------------------------------------------------
     PLATFORM_SETTINGS = {
-        'MCU_TYPE' : 'MSP430',   # MSP430   |  MSP432
-        'REHM' : 2800, # 75, 300.0,  # ehm equivalent resistance (ohm)
-        'VSUP' : 5.892, # 5.0, 3.0 (V)
-        'EAV_SAFE_MARGIN' : 0.60, # 0.10, 0.15, 0.20, ..., 0.55, # available energy will be reduced by this ratio
-        'DATA_SZ' : 2, # data size in bytes  # check 16 or 8
-        'POW_TYPE' : 'CONT',   #-> CONT
+        
+        'DATA_SZ' : 2, # data size in bytes  # check 16 or 8 
         'CPU_CLOCK': 16000000,         
-
-        # Constraints:
-        # * VM_CAPACITY for vm
-        # * NVM_CAPACITY for nvm
-        # * CCAP, VON and VOFF for energy per power cycle (cap_energy)
-        # * LAT_E2E_REQ for latency
-        # * IMC_CONSTRAINT for imc
-        #
 
         'VM_CONSTRAINT': (128*1024),
         # A constraint is skipped if the value is <= 0        
-        'VM_CAPACITY' : (512*1024),  # in bytes, note: leave room for application stack   #-> 256KB
+        'VM_CAPACITY' : (512*1024),  # in bytes
         'NVM_CAPACITY' : (1000000),    # total capacity across one of more FRAM chips  #-> 1MB  #increase for debugging
         'NVM_CAPACITY_ALLOCATION' : [1000000, 1000000], # if two FRAM chips, one for features and another for weights #increase for debugging
         'LAT_E2E_REQ' : 10000, # by default no e2e latency constraint (seconds)
-        'CCAP' : 0.005,  # capacitance (F)
-        'VON' : 4.535, # (V)
-        'VOFF' : 3.290, # (V)
-        #'IMC_CONSTRAINT': 50,  # 50 means 50%
         
-        # obtained by running tests on current EHM
-        'REHM_TABLE':
-            {
-                "0.005" : 2800,
-                "0.00047" : 3000,
-                "0.0001":  3100
-            }
     }
 
 
@@ -215,12 +190,12 @@ class Settings(object): ##default settintgs & discription
     # Search space optimization default settings    
     NAS_SSOPTIMIZER_SETTINGS = {
         'SUBNET_SAMPLE_SIZE' : 200,    
-        'VALID_SUBNETS_THRESHOLD': 0.25, # 0.05 or some other ratios
+        'VALID_SUBNETS_THRESHOLD': 0.35, # 0.05 or some other ratios
         'DO_RESAMPLING': False,
         'SSOPT_POLICY' : SSOptPolicy.FLOPS,
         # specify which constraints to consider
-        # VM, NVM, ENERGY should be always checked
-        'SSOPT_CONSTRAINTS': 'CHK_PASS_STORAGE,CHK_PASS_SPATIAL,CHK_PASS_ATOMICITY',   #-> REMOVE CHK_PASS_IMC',,CHK_PASS_RESPONSIVENESS
+        # VM, NVM, should be always checked
+        'SSOPT_CONSTRAINTS': 'CHK_PASS_STORAGE,CHK_PASS_SPATIAL', 
         'SSOPT_RESULTS_FNAME' : CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + GLOBAL_SETTINGS['EXP_SUFFIX'] + '_ssoptlog.json',
         'SSOPT_TRAINED_SUPERNET_FNAME' : CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + GLOBAL_SETTINGS['EXP_SUFFIX'] + '_trsupnetresults.json'        
     }
@@ -235,7 +210,7 @@ class Settings(object): ##default settintgs & discription
         'MUT_PROB': 0.05,    # probability
         'MUT_RATIO': 0.5,    #
         'EVOSEARCH_LOGFNAME' : CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + GLOBAL_SETTINGS['EXP_SUFFIX'] + "_evosearchlog.json",   
-        'EVOSEARCH_SCORE_TYPE' : 'ACC',  # please see evolution_finder.py: ACC | ACC_IMC | ACC_IMO_LREQ | ACC_LREQ  #-> ACC
+        'EVOSEARCH_SCORE_TYPE' : 'ACC',  
         'EVOSEARCH_TRIALS': 10,   # different seeds  # final test need to do more
         
         # Optional: This checks only NVM constraints, and it is only for getting results in a shorter time.        
@@ -280,7 +255,7 @@ class Settings(object): ##default settintgs & discription
             'MUT_PROB_PER_BLOCK': [0.05, 0.05, 0.05, 0.05],
             # For exploitation, later during evo search, same prob as default
             'MUT_PROB_PER_BLOCK_EXPLOITATION': [0.05, 0.05, 0.05, 0.05],
-            # For exploration, earlier during evo search, higher for first block (high IMO sensitivity)
+            # For exploration, earlier during evo search, higher for first block 
             'MUT_PROB_PER_BLOCK_EXPLORATION': [0.2, 0.05, 0.05, 0.05],
             # After N generations, switching from exploration to exploitation
             'BEST_STABLE_GENERATIONS': 5,
@@ -561,11 +536,6 @@ def arg_parser(test_settings):
     
     parser.add_argument('--dataset',  type=str,  default=argparse.SUPPRESS,  help="supported dataset including : 1. CIFAR10 (default), 2. IMAGE100")
     
-    parser.add_argument('--ccap',    type=float, default=argparse.SUPPRESS,   help="capacitor size")
-    parser.add_argument('--latreq',    type=float, default=argparse.SUPPRESS,   help="end-to-end latency requirement")
-    parser.add_argument('--imcreq',    type=float, default=argparse.SUPPRESS,   help="end-to-end IMC requirement")
-    parser.add_argument('--rehm',   type=float, default=argparse.SUPPRESS,   help="EHM equivalent resistance")
-
     parser.add_argument('--seed',    type=int, default=argparse.SUPPRESS,   help="seed for randomness, default is 123")
     parser.add_argument('--suffix',   type=str, default=argparse.SUPPRESS,   help="experiment run name suffix")
     parser.add_argument('--settings', type=str, default=argparse.SUPPRESS, help="settings files to load")
@@ -641,18 +611,7 @@ def arg_parser(test_settings):
         print('ARG_SET_SUFFIX : ', args.suffix)
         test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] = args.suffix
 
-    if 'ccap' in args:
-        print('ARG_SET_CCAP : ', args.ccap)
-        test_settings.PLATFORM_SETTINGS['CCAP'] = args.ccap
-    if 'latreq' in args:
-        print('ARG_SET_LATREQ : ', args.latreq)
-        test_settings.PLATFORM_SETTINGS['LAT_E2E_REQ'] = args.latreq
-    if 'imcreq' in args:
-        print('ARG_SET_LATREQ : ', args.imcreq)
-        test_settings.PLATFORM_SETTINGS['IMC_CONSTRAINT'] = args.imcreq
-    if 'rehm' in args:
-        print('ARG_SET_REHM : ', args.rehm)
-        test_settings.PLATFORM_SETTINGS['REHM'] = args.rehm
+    
     if 'stages' in args:
         print('ARG_STAGES : ', args.stages)
         test_settings.NAS_SETTINGS_GENERAL['STAGES'] = args.stages
@@ -678,12 +637,7 @@ def arg_parser(test_settings):
     test_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_TRAINED_SUPERNET_FNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + '_trsupnetresults.json'
     test_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_LOGFNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + "_evosearchlog.json"
 
-    if 'rehm' not in args:
-        cap_str = str(test_settings.PLATFORM_SETTINGS['CCAP'])
-        estimated_rehm = test_settings.PLATFORM_SETTINGS['REHM_TABLE'][cap_str]
-        test_settings.PLATFORM_SETTINGS['REHM'] = estimated_rehm
-
-    print('Updated settings:')
+    
     print(str(test_settings))
 
 

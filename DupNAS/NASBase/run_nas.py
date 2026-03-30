@@ -74,8 +74,6 @@ def stage_ss_optimization(global_settings: Settings, dataset, supernet_name, sta
 
     if global_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_POLICY'] == SSOptPolicy.FLOPS:
         stage_ss_opt_results['average_flops'] = supernet_properties['average_flops']
-    elif global_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_POLICY'] == SSOptPolicy.IMC:
-        stage_ss_opt_results['average_imc'] = supernet_properties['average_imc']
 
     # save stage SS_OPT results to JSON (dataset, supernet type, suitable configurations for the supernet)
     # overwrite json

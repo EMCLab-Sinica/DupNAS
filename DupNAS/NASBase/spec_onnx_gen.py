@@ -179,10 +179,10 @@ else:
                 print("len of network_nvm_usage: ", len(network_nvm_usage))
                 max_features = max((f + w for f, w in network_nvm_usage), default=0)
 
-                network_flops_contpow, _, _ = performance_model.get_network_flops(
+                network_flops, _, _ = performance_model.get_network_flops(
                     subnet_obj, fixed_params=None, layer_based_cals=True
                 )
-                flops_sum = int(sum(network_flops_contpow)) if network_flops_contpow else 0
+                flops_sum = int(sum(network_flops)) if network_flops else 0
 
                 model_name = f"{subnet_name}_w{width_multiplier}_ir{input_resolution}"
                 onnx_file = os.path.join(onnx_path, model_name + ".onnx")
