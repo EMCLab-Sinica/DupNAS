@@ -118,7 +118,7 @@ For more information, please refer to [Tflm-engine/README.md](Inference/Tflm-eng
 ### Accuracy
 Below are the networks found by DupNAS, TinyTS, and PatchTS.
 
-| Model | VM: | DupNAS | TinyTS | PatchTS |  
+| Model | VM | DupNAS | TinyTS | PatchTS |  
 |:---:|:---:|---:|:---:|:---:|
 | MobileNetV2 | 96 KB | 58.40% | 52.88% | 51.36% | 
 |             | 128 KB | 62.08% | 56.88% | 56.48% | 
