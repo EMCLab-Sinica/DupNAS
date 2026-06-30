@@ -24,7 +24,7 @@ EXGRULE="${1:-}"
 VM_SETTING="${2:-}"
 
 SEEDS="0,1,2,3,4,5,6,7,8,9"
-SAMPLES=100
+SAMPLES=1000
 SCRIPT="DupNAS_SA_exgrule.py"
 
 if [[ -z "${EXGRULE}" || -z "${VM_SETTING}" ]]; then

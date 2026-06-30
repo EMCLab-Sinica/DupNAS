@@ -344,7 +344,7 @@ def default_output_csv_name(input_dir: Path, exgrule: Optional[str] = None, mode
 
 
 
-def compute_exclusion_console_metrics(df: pd.DataFrame):
+def compute_exclusion_console_metrics(df: pd.DataFrame, model_group=None):
     """
     Console metrics for one <exgrule, model, vm_setting> run.
 
@@ -358,7 +358,19 @@ def compute_exclusion_console_metrics(df: pd.DataFrame):
     feasible_col = "overall_feasible_samples_satisfy_vm"
     total_col = "total_samples"
 
-    total_models = int(len(df))
+    parsed_models = int(len(df))
+
+    # Total originally-infeasible model candidates should use the full candidate count,
+    # not only the number of ALLSEEDS files currently parsed.
+    # shuffle/shufflenet has 2400 candidates; mobilenet/inception have 3200.
+    m = str(model_group or "").lower()
+    if m in {"shuffle", "shufflenet"}:
+        total_models = 2400
+    elif m in {"mobilenet", "mbv2", "inception", "incept"}:
+        total_models = 3200
+    else:
+        total_models = parsed_models
+
     feasible_counts = pd.to_numeric(df[feasible_col], errors="coerce").fillna(0)
     total_samples = pd.to_numeric(df[total_col], errors="coerce")
 
@@ -374,6 +386,7 @@ def compute_exclusion_console_metrics(df: pd.DataFrame):
     feasible_config_sets_pct = float(ratios.mean() * 100.0) if len(ratios) else 0.0
 
     return {
+        "parsed_allseed_models": parsed_models,
         "total_models": total_models,
         "dupnas_excluded_feasible_models": feasible_models,
         "dupnas_excluded_feasible_network_candidates_pct": dupnas_excluded_feasible_pct,
@@ -391,12 +404,16 @@ def write_report_with_top_section(df: pd.DataFrame, out_path: Path):
     # this avoids double-counting the same model.
     num_unique_models = int(df["model"].nunique())
 
-    console_metrics = compute_exclusion_console_metrics(df)
+    console_metrics = compute_exclusion_console_metrics(df, model_group=df["model_group"].iloc[0] if "model_group" in df.columns and len(df) else None)
 
     aggregate = pd.DataFrame([
         {
             "metric": "number_of_allseed_files",
             "value": num_allseed_files,
+        },
+        {
+            "metric": "total_originally_infeasible_models_for_percentage",
+            "value": console_metrics["total_models"],
         },
         {
             "metric": "number_of_unique_models",
@@ -560,9 +577,9 @@ def main():
         clean_tag = infer_output_tag(input_dir, exgrule, model, args.vm_setting)
         clean_name = f"allseed_report_by_model_vm_clean_{clean_tag}.csv"
     clean_csv = outdir / clean_name
-    # df.to_csv(clean_csv, index=False)
+    #df.to_csv(clean_csv, index=False)
 
-    console_metrics = compute_exclusion_console_metrics(df)
+    console_metrics = compute_exclusion_console_metrics(df, model_group=model)
 
     current_exgrule = exgrule if exgrule is not None else "all"
     current_model = model if model is not None else "all"
