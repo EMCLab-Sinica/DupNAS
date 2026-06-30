@@ -1,0 +1,167 @@
+cd HEtest
+bash run_shufflenet_exgrule.sh <exgrule> <vm_setting>
+python collect_allseed_report.py --exgrule <exgrule> --model <model> --vm_setting <vm_setting>
+
+==========================
+Figure 10 
+Use these in actions:
+
+//////////////////////////////////////////////////
+<exgrule> = neither
+
+options: neither-shufflenet-vm96
+cd HEtest
+bash run_shufflenet_exgrule.sh neither 96
+python3.9 collect_allseed_report.py --exgrule neither --model shufflenet --vm_setting 96
+
+
+options: neither-shufflenet-vm128
+cd HEtest
+bash run_shufflenet_exgrule.sh neither 128
+python3.9 collect_allseed_report.py --exgrule neither --model shufflenet --vm_setting 128
+
+
+options: neither-shufflenet-vm256
+cd HEtest
+bash run_shufflenet_exgrule.sh neither 256
+python3.9 collect_allseed_report.py --exgrule neither --model shufflenet --vm_setting 256
+
+
+options: neither-mobilenet-vm96
+cd HEtest
+bash run_mobilenet_exgrule.sh neither 96
+python3.9 collect_allseed_report.py --exgrule neither --model mobilenet --vm_setting 96
+
+options: neither-mobilenet-vm128
+cd HEtest
+bash run_mobilenet_exgrule.sh neither 128
+python3.9 collect_allseed_report.py --exgrule neither --model mobilenet --vm_setting 128
+
+options: neither-mobilenet-vm256
+cd HEtest
+bash run_mobilenet_exgrule.sh neither 256
+python3.9 collect_allseed_report.py --exgrule neither --model mobilenet --vm_setting 256
+
+options: neither-inception-vm96
+cd HEtest
+bash run_inception_exgrule.sh neither 96
+python3.9 collect_allseed_report.py --exgrule neither --model inception --vm_setting 96
+
+options: neither-inception-vm128
+cd HEtest
+bash run_inception_exgrule.sh neither 128
+python3.9 collect_allseed_report.py --exgrule neither --model inception --vm_setting 128
+
+options: neither-inception-vm256
+cd HEtest
+bash run_inception_exgrule.sh neither 256
+python3.9 collect_allseed_report.py --exgrule neither --model inception --vm_setting 256
+
+//////////////////////////////////////////////////
+<exgrule> = BPonly
+
+options: BPonly-shufflenet-vm96
+cd HEtest
+bash run_shufflenet_exgrule.sh BPonly 96
+python3.9 collect_allseed_report.py --exgrule BPonly --model shufflenet --vm_setting 96
+
+
+options: BPonly-shufflenet-vm128
+cd HEtest
+bash run_shufflenet_exgrule.sh BPonly 128
+python3.9 collect_allseed_report.py --exgrule BPonly --model shufflenet --vm_setting 128
+
+
+options: BPonly-shufflenet-vm256
+cd HEtest
+bash run_shufflenet_exgrule.sh BPonly 256
+python3.9 collect_allseed_report.py --exgrule BPonly --model shufflenet --vm_setting 256
+
+
+options: BPonly-mobilenet-vm96
+cd HEtest
+bash run_mobilenet_exgrule.sh BPonly 96
+python3.9 collect_allseed_report.py --exgrule BPonly --model mobilenet --vm_setting 96
+
+options: BPonly-mobilenet-vm128
+cd HEtest
+bash run_mobilenet_exgrule.sh BPonly 128
+python3.9 collect_allseed_report.py --exgrule BPonly --model mobilenet --vm_setting 128
+
+options: BPonly-mobilenet-vm256
+cd HEtest
+bash run_mobilenet_exgrule.sh BPonly 256
+python3.9 collect_allseed_report.py --exgrule BPonly --model mobilenet --vm_setting 256
+
+options: BPonly-inception-vm96
+cd HEtest
+bash run_inception_exgrule.sh BPonly 96
+python3.9 collect_allseed_report.py --exgrule BPonly --model inception --vm_setting 96
+
+options: BPonly-inception-vm128
+cd HEtest
+bash run_inception_exgrule.sh BPonly 128
+python3.9 collect_allseed_report.py --exgrule BPonly --model inception --vm_setting 128
+
+options: BPonly-inception-vm256
+cd HEtest
+bash run_inception_exgrule.sh BPonly 256
+python3.9 collect_allseed_report.py --exgrule BPonly --model inception --vm_setting 256
+
+//////////////////////////////////////////////////
+<exgrule> = PConly
+
+options: PConly-shufflenet-vm96
+cd HEtest
+bash run_shufflenet_exgrule.sh PConly 96
+python3.9 collect_allseed_report.py --exgrule PConly --model shufflenet --vm_setting 96
+
+
+options: PConly-shufflenet-vm128
+cd HEtest
+bash run_shufflenet_exgrule.sh PConly 128
+python3.9 collect_allseed_report.py --exgrule PConly --model shufflenet --vm_setting 128
+
+
+options: PConly-shufflenet-vm256
+cd HEtest
+bash run_shufflenet_exgrule.sh PConly 256
+python3.9 collect_allseed_report.py --exgrule PConly --model shufflenet --vm_setting 256
+
+
+options: PConly-mobilenet-vm96
+cd HEtest
+bash run_mobilenet_exgrule.sh PConly 96
+python3.9 collect_allseed_report.py --exgrule PConly --model mobilenet --vm_setting 96
+
+options: PConly-mobilenet-vm128
+cd HEtest
+bash run_mobilenet_exgrule.sh PConly 128
+python3.9 collect_allseed_report.py --exgrule PConly --model mobilenet --vm_setting 128
+
+options: PConly-mobilenet-vm256
+cd HEtest
+bash run_mobilenet_exgrule.sh PConly 256
+python3.9 collect_allseed_report.py --exgrule PConly --model mobilenet --vm_setting 256
+
+options: PConly-inception-vm96
+cd HEtest
+bash run_inception_exgrule.sh PConly 96
+python3.9 collect_allseed_report.py --exgrule PConly --model inception --vm_setting 96
+
+options: PConly-inception-vm128
+cd HEtest
+bash run_inception_exgrule.sh PConly 128
+python3.9 collect_allseed_report.py --exgrule PConly --model inception --vm_setting 128
+
+options: PConly-inception-vm256
+cd HEtest
+bash run_inception_exgrule.sh PConly 256
+python3.9 collect_allseed_report.py --exgrule PConly --model inception --vm_setting 256
+
+
+==========================
+
+/// Output files FOR each option ///
+all results (can download to check): HEtest/allseed_report_summary_<exgrule>_<model>_VM<vm_setting>.csv
+
