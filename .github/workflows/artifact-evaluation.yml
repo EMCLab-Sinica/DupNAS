@@ -9,6 +9,7 @@ on:
         options:
           - test
           - fig6
+          - fig9
           - fig11
       option:
         type: string
