@@ -1,0 +1,44 @@
+{
+  "memory": {
+    "mempools": [
+      {
+        "name": "RAM",
+        "prop": {
+          "throughput": "HIGH",
+          "latency": "LOW"
+        },
+        "usable_size": {
+          "value": "327680",
+          "magnitude": "BYTES"
+        },
+        "size": {
+          "value": "327680",
+          "magnitude": "BYTES"
+        },
+        "offset": {
+          "value": "0x20000000",
+          "magnitude": "BYTES"
+        }
+      },
+      {
+        "name": "External SDRAM",
+        "prop": {
+          "throughput": "HIGH",
+          "latency": "MID"
+        },
+        "usable_size": {
+          "value": "16777216",
+          "magnitude": "BYTES"
+        },
+        "size": {
+          "value": "16777216",
+          "magnitude": "BYTES"
+        },
+        "offset": {
+          "value": "0xc0000000",
+          "magnitude": "BYTES"
+        }
+      }
+    ]
+  }
+}

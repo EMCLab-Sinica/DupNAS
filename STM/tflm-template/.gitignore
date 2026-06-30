@@ -1,0 +1,6 @@
+gen
+src/gen
+src/models
+tflite-micro
+venv
+tflm_main

@@ -1,5 +1,5 @@
 name: artifact-evaluation
-run-name: ${{ inputs.task }}
+run-name: ${{ inputs.task }} / ${{ inputs.optionDisplayName }}
 on:
   workflow_dispatch:
     inputs:
@@ -7,16 +7,72 @@ on:
         type: choice
         required: true
         options:
-        - task_1
-        - task_2
+          - test
+          - fig6
+          - fig9
+          - fig11
+      option:
+        type: string
+        required: true
+      optionDisplayName:
+        type: string
+        required: true
 jobs:
-  task_1:
-    if: ${{ inputs.task == 'task_1' }}
-    runs-on: [self-hosted, ae-server]
-    steps:
-      - run: sleep 1m
-  task_2:
-    if: ${{ inputs.task == 'task_2' }}
+  test:
+    if: ${{ inputs.task == 'test' }}
     runs-on: [self-hosted, ae-machine]
+    env:
+      OPTION: ${{ inputs.option }}
+    defaults:
+      run:
+        working-directory: STM/
     steps:
-      - run: sleep 1m
+      - uses: actions/checkout@v6
+      - name: Run test
+        run: bash test.sh "$OPTION"
+  fig6:
+    if: ${{ inputs.task == 'fig6' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig6
+        run: bash scripts/fig6.sh "$OPTION"
+  fig9:
+    if: ${{ inputs.task == 'fig9' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig9
+        run: bash scripts/fig9.sh "$OPTION"
+  fig11:
+    if: ${{ inputs.task == 'fig11' }}
+    runs-on: [self-hosted, ae-machine]
+    env:
+      OPTION: ${{ inputs.option }}
+    defaults:
+      run:
+        working-directory: STM/
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reset USB devices
+        run: bash utils/reset_usb.sh
+      - name: Patch repository root
+        run: bash utils/patch_repo_root.sh
+      - name: Gather TFLM memory usage
+        if: ${{ contains(inputs.option, 'tflm') }}
+        run: bash utils/gather_tflm_mem.sh
+      - name: Run fig11
+        run: bash fig11.sh "$OPTION"
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: STM/results/
