@@ -23,11 +23,11 @@ set -euo pipefail
 #
 # Examples:
 #   bash random_run_TStime.sh shufflenet python3.9 0
-#   bash random_run_TStime.sh mobilenet python3.9 1
-#   bash random_run_TStime.sh inception python3.9 2
+#   bash random_run_TStime.sh mobilenet python3.9 0
+#   bash random_run_TStime.sh inception python3.9 0
 
 TIME_LIMIT="${TIME_LIMIT:-300}"
-SAMPLE_N="${SAMPLE_N:-10}"
+SAMPLE_N="${SAMPLE_N:-100}"
 VMS=(96 128 256)
 
 MODEL_NAME="${1:-}"
