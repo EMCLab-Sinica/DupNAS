@@ -79,8 +79,8 @@ python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model shufflene
 
 
 all outputs are saved in:
-sample_onnx/outputs/all_output_dupnasa_summary.csv
-sample_onnx/outputs/all_output_dupnasa_detail.csv
+sample_onnx/outputs/<model>_<vm_setting>_summary.csv
+sample_onnx/outputs/<model>_<vm_setting>_detail.csv
 
 
 
