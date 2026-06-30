@@ -36,6 +36,8 @@ jobs:
       OPTION: ${{ inputs.option }}
     steps:
       - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
       - name: Run fig6
         run: bash scripts/fig6.sh "$OPTION"
   fig11:
