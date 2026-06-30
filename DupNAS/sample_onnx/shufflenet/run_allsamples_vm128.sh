@@ -14,7 +14,7 @@ set -euo pipefail
 # Example:
 #   bash run_allsamples_vmXX.sh /path/to/output_dir python3
 
-VM_SIZE=256
+VM_SIZE=128
 TIME_LIMIT="${TIME_LIMIT:-180}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"       # sample_onnx/<model>
@@ -23,9 +23,9 @@ SAMPLE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"               # sample_onnx
 ONNX_DIR="$SCRIPT_DIR"
 PY_SCRIPT="$SAMPLE_ROOT/DupNAS_SA.py"
 
-OUTPUT_ROOT="${1:-${OUTPUT_ROOT:-$SAMPLE_ROOT/output_dir}}"
+# OUTPUT_ROOT="${1:-${OUTPUT_ROOT:-$SAMPLE_ROOT/output_dir}}"
 PY_RAW="${2:-${PYTHON:-}}"
-OUTDIR="$OUTPUT_ROOT/$MODEL_NAME/vm$VM_SIZE"
+OUTDIR="$SAMPLE_ROOT/outputs/$MODEL_NAME/vm$VM_SIZE"
 mkdir -p "$OUTDIR"
 
 pick_python() {

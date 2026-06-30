@@ -98,13 +98,22 @@ def reduction_bin(red: float) -> str:
     return "4/4_[75,100%]"
 
 
-def find_vm_dirs(output_root: Path) -> Iterable[Tuple[str, int, Path]]:
+def find_vm_dirs(output_root: Path, model_filter: Optional[str] = None, vm_filter: Optional[int] = None) -> Iterable[Tuple[str, int, Path]]:
+    """Find model/vm folders, optionally filtered by one model and one VM."""
+    model_filter_norm = model_filter.lower() if model_filter else None
+
     for model_dir in sorted([p for p in output_root.iterdir() if p.is_dir()]):
+        if model_filter_norm and model_dir.name.lower() != model_filter_norm:
+            continue
+
         for vm_dir in sorted([p for p in model_dir.iterdir() if p.is_dir()]):
             m = RE_VM_DIR.match(vm_dir.name)
             if not m:
                 continue
-            yield model_dir.name, int(m.group(1)), vm_dir
+            vm_kb = int(m.group(1))
+            if vm_filter is not None and vm_kb != vm_filter:
+                continue
+            yield model_dir.name, vm_kb, vm_dir
 
 
 def process_vm_dir(model: str, vm_kb: int, vm_dir: Path, args: argparse.Namespace) -> Tuple[List[dict], List[dict]]:
@@ -181,6 +190,28 @@ def process_vm_dir(model: str, vm_kb: int, vm_dir: Path, args: argparse.Namespac
     return detail_rows, summary_rows
 
 
+
+def print_summary_rows(rows: List[dict]) -> None:
+    """Print the same summary information to console."""
+    for r in rows:
+        print("")
+        print(f"[Summary] {r['model_family']} {r['vm']}")
+        print(f"  model_family: {r['model_family']}")
+        print(f"  vm: {r['vm']}")
+        print(f"  total_onnx: {r['total_onnx']}")
+        print(f"  original_feasible: {r['original_feasible']}")
+        print(f"  original_feasible_ratio: {r['original_feasible_ratio']}")
+        print(f"  dupnas_feasible: {r['dupnas_feasible']}")
+        print(f"  dupnas_feasible_ratio: {r['dupnas_feasible_ratio']}")
+        print(f"  reduction_1/4_count: {r['reduction_1/4_count']}")
+        print(f"  reduction_1/4_ratio_in_dupnasa_feasible: {r['reduction_1/4_ratio_in_dupnasa_feasible']}")
+        print(f"  reduction_2/4_count: {r['reduction_2/4_count']}")
+        print(f"  reduction_2/4_ratio_in_dupnasa_feasible: {r['reduction_2/4_ratio_in_dupnasa_feasible']}")
+        print(f"  reduction_3/4_count: {r['reduction_3/4_count']}")
+        print(f"  reduction_3/4_ratio_in_dupnasa_feasible: {r['reduction_3/4_ratio_in_dupnasa_feasible']}")
+        print(f"  reduction_4/4_count: {r['reduction_4/4_count']}")
+        print(f"  reduction_4/4_ratio_in_dupnasa_feasible: {r['reduction_4/4_ratio_in_dupnasa_feasible']}")
+
 def write_csv(path: Path, rows: List[dict]) -> None:
     if not rows:
         print(f"[WARN] No rows for {path.name}; skip writing")
@@ -196,8 +227,14 @@ def write_csv(path: Path, rows: List[dict]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--output_dir", required=True, help="Root output directory containing model/vm folders")
-    ap.add_argument("--summary_csv", default="all_output_dupnasa_summary.csv")
-    ap.add_argument("--detail_csv", default="all_output_dupnasa_detail.csv")
+    ap.add_argument("--model", choices=["shufflenet", "mobilenet", "inception"],
+                    help="Analyze only one model family, e.g., shufflenet")
+    ap.add_argument("--vm", type=int, choices=[96, 128, 256],
+                    help="Analyze only one VM setting in KB, e.g., 96")
+    ap.add_argument("--summary_csv", default=None,
+                    help="Output summary CSV name. Default: all_output_dupnasa_summary.csv, or <model>_vm<vm>_summary.csv when filters are used.")
+    ap.add_argument("--detail_csv", default=None,
+                    help="Output detail CSV name. Default: all_output_dupnasa_detail.csv, or <model>_vm<vm>_detail.csv when filters are used.")
     ap.add_argument("--max_bytes", type=int, default=8 * 1024 * 1024)
     ap.add_argument("--max_lines", type=int, default=20000)
     args = ap.parse_args()
@@ -209,14 +246,34 @@ def main() -> None:
     all_details: List[dict] = []
     all_summaries: List[dict] = []
 
-    for model, vm_kb, vm_dir in find_vm_dirs(output_root):
+    for model, vm_kb, vm_dir in find_vm_dirs(output_root, args.model, args.vm):
         print(f"[Info] Process {model}/vm{vm_kb}: {vm_dir}")
         detail_rows, summary_rows = process_vm_dir(model, vm_kb, vm_dir, args)
         all_details.extend(detail_rows)
         all_summaries.extend(summary_rows)
 
     if not all_summaries:
-        raise SystemExit("[ERROR] No model/vm output folders found or no *_mem_usage.txt files detected")
+        filt = []
+        if args.model:
+            filt.append(f"model={args.model}")
+        if args.vm:
+            filt.append(f"vm={args.vm}")
+        filt_msg = " with " + ", ".join(filt) if filt else ""
+        raise SystemExit(f"[ERROR] No model/vm output folders found{filt_msg}, or no *_mem_usage.txt files detected")
+
+    if args.summary_csv is None:
+        if args.model and args.vm:
+            args.summary_csv = f"{args.model}_vm{args.vm}_summary.csv"
+        else:
+            args.summary_csv = "all_output_dupnasa_summary.csv"
+
+    if args.detail_csv is None:
+        if args.model and args.vm:
+            args.detail_csv = f"{args.model}_vm{args.vm}_detail.csv"
+        else:
+            args.detail_csv = "all_output_dupnasa_detail.csv"
+
+    print_summary_rows(all_summaries)
 
     write_csv(output_root / args.summary_csv, all_summaries)
     write_csv(output_root / args.detail_csv, all_details)
