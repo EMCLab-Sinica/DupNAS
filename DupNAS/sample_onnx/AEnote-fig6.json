@@ -1,3 +1,7 @@
+cd DupNAS/sample_onnx/<model>
+bash run_allsamples_vm96.sh <output_dir> python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir <output_dir> --model <model> --vm <vm_setting>
 
 ==========================
 <Figure 6> Use these in actions:

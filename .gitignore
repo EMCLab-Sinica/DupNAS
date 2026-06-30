@@ -19,3 +19,7 @@ DupNAS/NASBase/dataset/
 DupNAS/sample_onnx/outputs/shufflenet/
 DupNAS/sample_onnx/outputs/mobilenet/
 DupNAS/sample_onnx/outputs/inception/
+
+DupNAS/TStime/shufflenet/
+DupNAS/TStime/mobilenet/
+DupNAS/TStime/inception/
