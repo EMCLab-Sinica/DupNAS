@@ -9,3 +9,6 @@ __pycache__/
 *.pyc
 *.bat
 *.xlsx
+DupNAS/sample_onnx/inception/*.onnx
+DupNAS/sample_onnx/shufflenet/*.onnx
+DupNAS/sample_onnx/mobilenet/*.onnx
