@@ -7,7 +7,6 @@ on:
         type: choice
         required: true
         options:
-          - test
           - fig6
           - fig8
           - fig9
@@ -20,18 +19,6 @@ on:
         type: string
         required: true
 jobs:
-  test:
-    if: ${{ inputs.task == 'test' }}
-    runs-on: [self-hosted, ae-machine]
-    env:
-      OPTION: ${{ inputs.option }}
-    defaults:
-      run:
-        working-directory: STM/
-    steps:
-      - uses: actions/checkout@v6
-      - name: Run test
-        run: bash scripts/test.sh "$OPTION"
   fig6:
     if: ${{ inputs.task == 'fig6' }}
     runs-on: [self-hosted, ae-server]
