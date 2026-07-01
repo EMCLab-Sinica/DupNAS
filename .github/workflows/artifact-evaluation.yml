@@ -63,6 +63,11 @@ jobs:
         run: bash scripts/link_models.sh
       - name: Run fig10
         run: bash scripts/fig10.sh "$OPTION"
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: DupNAS/HEtest/allseed_report_summary_*.csv
   fig11:
     if: ${{ inputs.task == 'fig11' }}
     runs-on: [self-hosted, ae-machine]
