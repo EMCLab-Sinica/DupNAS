@@ -2,7 +2,7 @@ set -euo pipefail
 
 [[ "$OPTION" =~ ^(shufflenet|mobilenet|inception)$ ]] || { echo "Error: Invalid OPTION"; exit 1; }
 
-MODEL="$OPTION"
+MODEL="${BASH_REMATCH[1]}"
 
 echo "Running model: $MODEL..."
 
