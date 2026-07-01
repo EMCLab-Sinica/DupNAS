@@ -1,7 +1,7 @@
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-    echo "usage: $0 MODELS_TXT flash,ram,latency"
+    echo "usage: $0 MODELS_TXT flash,ram,latency,accuracy"
     exit 1
 fi
 
@@ -24,6 +24,7 @@ ONNX_MODELS_DIR="onnx_models"
 TFLM_MODELS_DIR="tflm-template/src/models"
 RESULTS_DIR="$PWD/results/cubeai_f7"
 RESULTS_CSV="$RESULTS_DIR/results.csv"
+ACCURACY_CSV="$(dirname "$0")/accuracy.csv"
 
 BATCH_SIZE="1"
 OPT="balanced"
@@ -115,6 +116,11 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
 
     LATENCY=$(grep "duration DWT" "$BOARD_LOG" | awk '{print $5}' || true)
     LATENCY=${LATENCY:-NA}
+
+    ACCURACY_NAME="${MODEL_NAME%_full_integer_quant}"
+    ACCURACY_NAME="${ACCURACY_NAME%_quantized}"
+    ACCURACY=$(awk -F, -v model="$ACCURACY_NAME" '$1 == model {print $2; exit}' "$ACCURACY_CSV" || true)
+    ACCURACY=${ACCURACY:-NA}
 
     ROW="$MODEL_NAME"
     SUMMARY=""

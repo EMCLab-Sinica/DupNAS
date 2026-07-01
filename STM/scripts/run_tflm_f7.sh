@@ -1,7 +1,7 @@
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-    echo "usage: $0 MODELS_TXT flash,ram,latency"
+    echo "usage: $0 MODELS_TXT flash,ram,latency,accuracy"
     exit 1
 fi
 
@@ -21,6 +21,7 @@ METRICS="$2"
 TFLM_MODELS_DIR="tflm-template/src/models"
 RESULTS_DIR="$PWD/results/tflm_f7"
 RESULTS_CSV="$RESULTS_DIR/results.csv"
+ACCURACY_CSV="$(dirname "$0")/accuracy.csv"
 
 rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
@@ -88,6 +89,11 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
 
     LATENCY=$(grep "completed" "$BOARD_LOG" | awk '{print $4}' || true)
     LATENCY=${LATENCY:-NA}
+
+    ACCURACY_NAME="${MODEL_NAME%_full_integer_quant}"
+    ACCURACY_NAME="${ACCURACY_NAME%_quantized}"
+    ACCURACY=$(awk -F, -v model="$ACCURACY_NAME" '$1 == model {print $2; exit}' "$ACCURACY_CSV" || true)
+    ACCURACY=${ACCURACY:-NA}
 
     ROW="$MODEL_NAME"
     SUMMARY=""
