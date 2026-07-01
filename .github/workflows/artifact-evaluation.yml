@@ -52,6 +52,17 @@ jobs:
         run: bash scripts/link_models.sh
       - name: Run fig9
         run: bash scripts/fig9.sh "$OPTION"
+  fig10:
+    if: ${{ inputs.task == 'fig10' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig10
+        run: bash scripts/fig10.sh "$OPTION"
   fig11:
     if: ${{ inputs.task == 'fig11' }}
     runs-on: [self-hosted, ae-machine]
