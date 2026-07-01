@@ -7,4 +7,5 @@ VM="${BASH_REMATCH[2]}"
 
 echo "Running model: $MODEL, VM: $VM..."
 
+touch tflm-template/host.txt
 bash "scripts/run_tflm_f7.sh" "scripts/fig8/${MODEL}-vm${VM}.txt" latency,accuracy
