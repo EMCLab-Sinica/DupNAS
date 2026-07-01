@@ -5,7 +5,7 @@ set -euo pipefail
 MODEL="${OPTION%-vm*}"
 VM="${OPTION#*-vm}"
 
-echo "Executing Model: $MODEL, VM: $VM..."
+echo "Running model: $MODEL, VM: $VM..."
 
 cd "DupNAS/sample_onnx/$MODEL"
 bash "run_allsamples_vm${VM}.sh" ../outputs python3.9

@@ -4,7 +4,7 @@ set -euo pipefail
 
 MODEL="$OPTION"
 
-echo "Executing Model: $MODEL..."
+echo "Running model: $MODEL..."
 
 cd DupNAS/TStime
 bash random_run_TStime.sh "$MODEL" python3.9 0
