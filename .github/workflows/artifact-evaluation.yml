@@ -10,6 +10,7 @@ on:
           - test
           - fig6
           - fig9
+          - fig10
           - fig11
       option:
         type: string
