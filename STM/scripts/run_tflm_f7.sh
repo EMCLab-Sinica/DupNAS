@@ -27,6 +27,17 @@ rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
 echo "model_name,$METRICS" > "$RESULTS_CSV"
 
+scale_metric() {
+    [ "$1" = "NA" ] && echo "NA" || awk -v value="$1" 'BEGIN {printf "%.3f\n", value / 1000}'
+}
+
+metric_unit() {
+    case "$1" in
+        flash|ram) echo "KB" ;;
+        latency) echo "s" ;;
+    esac
+}
+
 run_model() {
     local MODEL_NAME="$1"
     local SANITIZED_NAME="$2"
@@ -83,12 +94,15 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
 
     FLASH=$(grep "${MODEL_NAME}.*started" tflm-template/host.txt | awk '{print $3}' | tr -d "(" || true)
     FLASH=${FLASH:-NA}
+    FLASH=$(scale_metric "$FLASH")
 
     RAM=$(grep -A 1 "${MODEL_NAME}.*started" tflm-template/host.txt | grep "Arena allocation total" | awk '{print $5}' || true)
     RAM=${RAM:-NA}
+    RAM=$(scale_metric "$RAM")
 
     LATENCY=$(grep "completed" "$BOARD_LOG" | awk '{print $4}' || true)
     LATENCY=${LATENCY:-NA}
+    LATENCY=$(scale_metric "$LATENCY")
 
     ACCURACY_NAME="${MODEL_NAME%_full_integer_quant}"
     ACCURACY_NAME="${ACCURACY_NAME%_quantized}"
@@ -100,8 +114,10 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
     for METRIC in ${METRICS//,/ }; do
         VAR="${METRIC^^}"
         VALUE="${!VAR}"
+        UNIT=$(metric_unit "$METRIC")
+        DISPLAY="${VALUE}${UNIT:+ $UNIT}"
         ROW="$ROW,$VALUE"
-        SUMMARY="${SUMMARY:+$SUMMARY, }$METRIC: $VALUE"
+        SUMMARY="${SUMMARY:+$SUMMARY, }$METRIC: $DISPLAY"
     done
 
     echo "$SUMMARY"
