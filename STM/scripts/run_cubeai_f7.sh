@@ -135,4 +135,4 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
     echo "$ROW" >> "$RESULTS_CSV"
 done < "$MODELS_TXT"
 
-echo "All jobs finished."
+echo "Completed. Results saved to $RESULTS_CSV"
