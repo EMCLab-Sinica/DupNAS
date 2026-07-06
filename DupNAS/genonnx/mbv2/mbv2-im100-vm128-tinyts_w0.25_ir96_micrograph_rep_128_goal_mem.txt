@@ -1,6 +1,6 @@
-Full_duration:1.699725866317749(s)
+Full_duration:1.6971733570098877(s)
 peak node list:[6, 7, 8, 1, 18, 19, 20, 30, 31, 32, 0, 54, 55, 56, 9]
-MICROGRAPH_duration:0.001728(s)
+MICROGRAPH_duration:0.001699(s)
 Peak memory: : 124704 bytes (121 KB)
 ori MAC: 609205248
 ori weight access: 2418712

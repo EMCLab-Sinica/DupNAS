@@ -1,0 +1,13 @@
+model_name,onnx,input_shape,layout,input_size,num_images,top1_acc,top5_acc,provider
+incept-im100-vm128-dupnas_w0.5_ir128_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm128-dupnas_w0.5_ir128_ts.onnx,"[1, 3, 128, 128]",NCHW,128,200,68.0,90.5,CPUExecutionProvider
+incept-im100-vm128-nots_w0.75_ir32_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm128-nots_w0.75_ir32_ts.onnx,"[1, 3, 32, 32]",NCHW,32,200,58.5,83.0,CPUExecutionProvider
+incept-im100-vm128-patchts_w0.5_ir128_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm128-patchts_w0.5_ir128_ts.onnx,"[1, 3, 128, 128]",NCHW,128,200,67.5,91.5,CPUExecutionProvider
+incept-im100-vm128-tinyts_w0.5_ir96_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm128-tinyts_w0.5_ir96_ts.onnx,"[1, 3, 96, 96]",NCHW,96,200,60.0,86.0,CPUExecutionProvider
+incept-im100-vm256-dupnas_w0.75_ir128_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm256-dupnas_w0.75_ir128_ts.onnx,"[1, 3, 128, 128]",NCHW,128,200,68.0,91.0,CPUExecutionProvider
+incept-im100-vm256-nots_w0.75_ir64_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm256-nots_w0.75_ir64_ts.onnx,"[1, 3, 64, 64]",NCHW,64,200,60.5,88.5,CPUExecutionProvider
+incept-im100-vm256-patchts_w0.75_ir128_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm256-patchts_w0.75_ir128_ts.onnx,"[1, 3, 128, 128]",NCHW,128,200,67.5,90.5,CPUExecutionProvider
+incept-im100-vm256-tinyts_w0.5_ir96_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm256-tinyts_w0.5_ir96_ts.onnx,"[1, 3, 96, 96]",NCHW,96,200,67.0,92.0,CPUExecutionProvider
+incept-im100-vm96-dupnas_w0.75_ir96_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm96-dupnas_w0.75_ir96_ts.onnx,"[1, 3, 96, 96]",NCHW,96,200,67.5,88.5,CPUExecutionProvider
+incept-im100-vm96-nots_w0.5_ir32_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm96-nots_w0.5_ir32_ts.onnx,"[1, 3, 32, 32]",NCHW,32,200,61.0,83.5,CPUExecutionProvider
+incept-im100-vm96-patchts_w0.25_ir96_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm96-patchts_w0.25_ir96_ts.onnx,"[1, 3, 96, 96]",NCHW,96,200,65.0,94.5,CPUExecutionProvider
+incept-im100-vm96-tinyts_w0.25_ir64_ts.onnx,../Inference/Model-converter/ts_converted/incept/incept-im100-vm96-tinyts_w0.25_ir64_ts.onnx,"[1, 3, 64, 64]",NCHW,64,200,51.5,83.0,CPUExecutionProvider

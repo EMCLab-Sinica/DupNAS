@@ -1,6 +1,6 @@
 under_mem:True
 peak node list:[1, 0, 11, 12, 101, 102, 56, 57, 71, 72, 86, 87]
-Full_duration:1.8016729354858398(s)
+Full_duration:1.7521989345550537(s)
 Peak memory for all: : 122880 bytes (120 KB)
 Peak memory under dup: : 122880 bytes (120 KB)
 ori MAC: 127057920

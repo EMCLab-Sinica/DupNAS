@@ -190,6 +190,15 @@ echo "========== Generate TS config =========="
     echo "[ERROR] gen_ts_cfg.py failed"
     exit 1
 }
+echo "Outputs (TS config) saved as <model>_config.json"
+
+echo "========== Run TS converter =========="
+bash "$SCRIPT_DIR/run_ts_convert.sh" || {
+    echo "[ERROR] run_ts_convert.sh failed"
+    exit 1
+}
+echo "Outputs (split model) saved under /DupNAS-AE/Inference/Model-converter/ts_converted/<model>/"
+
 
 echo "========== run_all_onnx.sh DONE =========="
 echo -e "\a"

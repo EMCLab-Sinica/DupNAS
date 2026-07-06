@@ -9,7 +9,6 @@ def _build_group(group_info):
     group_start, group_end = group_info.node_range
     name_scope = f"g{group_start}_{group_end}"
 
-    # Split the group input once, then reuse tiles throughout the rewrite.
     entry_tiles, entry_slice_nodes = _emit_entry_tiles(
         group_info.entry_tensor,
         range_plan.entry_ranges,
@@ -17,11 +16,9 @@ def _build_group(group_info):
     )
 
     split_pos_by_key = {split_key: split_pos for split_pos, split_key in enumerate(range_plan.split_keys)}
-
     tiles_by_local_index = [[None for _ in range(split_count)] for _ in group_info.nodes]
     body_nodes = []
 
-    # Lower each requested (node, tile) step in execution order.
     for orig_index, split_id in group_info.execution_order:
         split_pos = split_pos_by_key[split_id]
         local_index = orig_index - group_start
@@ -29,7 +26,6 @@ def _build_group(group_info):
 
         node_spec = group_info.node_specs[local_index]
         demanded_ranges = range_plan.input_ranges_by_node[local_index]
-
         input_tensors_by_index = {}
 
         for input_index, source in node_spec.input_sources.items():
@@ -74,14 +70,6 @@ def _build_group(group_info):
     concat_nodes_all = []
 
     def _nonoverlap_ranges_for_tensor(output_tensor):
-        """Return the true non-overlapping tile ranges for reconstructing a full tensor.
-
-        range_plan.output_ranges_by_node may be expanded by downstream halo
-        demands. That expanded range is correct for feeding the next tiled op,
-        but it is not correct for stitching a full tensor for an outside
-        consumer. For reconstruction, crop each tile back to its own
-        non-overlapping partition first, then concatenate.
-        """
         split_count_h, split_count_w = group_info.tile_count
         height_ranges = _partition_ranges(output_tensor.shape[2], split_count_h)
         width_ranges = _partition_ranges(output_tensor.shape[3], split_count_w)
@@ -105,7 +93,7 @@ def _build_group(group_info):
                     produced_range,
                     target_range,
                     split_id,
-                    f"{output_tensor.name}_external_reconstruct",
+                    f"{output_tensor.name}_full_reconstruct",
                     name_scope,
                 )
                 concat_nodes_all.append(crop_node)
@@ -113,12 +101,16 @@ def _build_group(group_info):
 
         return reconstructed_tiles
 
-    # Reconstruct non-sink outputs that are still consumed outside the TS group.
-    # The in-group path uses expanded/halo tiles directly. Outside consumers need
-    # the original full tensor, so crop tiles to non-overlapping partitions before
-    # concatenating them back.
+    # Reconstruct every output that is consumed outside the group. This supports
+    # both the original single-sink case and TinyTS/PatchTS multi-sink branch
+    # groups that stop before the merge/Concat.
+    seen_tensors = set()
     for local_index in group_info.external_output_local_indices:
         output_tensor = group_info.nodes[local_index].outputs[0]
+        if id(output_tensor) in seen_tensors:
+            continue
+        seen_tensors.add(id(output_tensor))
+
         reconstruction_tiles = _tiles_for_full_reconstruction(local_index, output_tensor)
         stitched_output, concat_nodes = _emit_group_concat(
             reconstruction_tiles,
@@ -129,16 +121,6 @@ def _build_group(group_info):
         )
         stitched_outputs.append((output_tensor, stitched_output))
         concat_nodes_all.extend(concat_nodes)
-
-    stitched_exit, concat_nodes = _emit_group_concat(
-        tiles_by_local_index[-1],
-        group_info.exit_tensor,
-        range_plan.split_keys,
-        group_info.tile_count,
-        name_scope,
-    )
-    stitched_outputs.append((group_info.exit_tensor, stitched_exit))
-    concat_nodes_all.extend(concat_nodes)
 
     ordered_nodes = entry_slice_nodes + body_nodes + concat_nodes_all
     return ordered_nodes, stitched_outputs

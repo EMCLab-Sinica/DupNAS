@@ -125,6 +125,25 @@ def _emit_tile_crop(tile, produced_range, required_range, split_id, name_prefix,
     return out, node
 
 
+
+def _make_pad_constant_for_tile(original_pad_node, spatial_pads, const_name):
+    """Build an ONNX Pad pads constant for one spatial tile.
+
+    spatial_pads is (top, left, bottom, right). Non-spatial axes are kept 0
+    so each tile only pads H/W enough to reproduce its exact output region.
+    """
+    rank = len(original_pad_node.inputs[0].shape)
+    pads = np.zeros(2 * rank, dtype=np.int64)
+    spatial_h = rank - 2
+    spatial_w = rank - 1
+    top, left, bottom, right = spatial_pads
+    pads[spatial_h] = int(top)
+    pads[spatial_w] = int(left)
+    pads[rank + spatial_h] = int(bottom)
+    pads[rank + spatial_w] = int(right)
+    return gs.Constant(const_name, pads)
+
+
 def _emit_tiled_node(node, split_id, input_tensors_by_index, out_range, hw_pads, name_scope):
     node_base_name = node.name or (
         node.outputs[0].name if node.outputs and node.outputs[0].name else node.op
@@ -171,6 +190,14 @@ def _emit_tiled_node(node, split_id, input_tensors_by_index, out_range, hw_pads,
     if node.op in {"Conv", "AveragePool"}:
         assert hw_pads is not None, f"hw pads are required when lowering {node.op} nodes"
         attrs["pads"] = hw_pads
+    elif node.op == "Pad":
+        assert hw_pads is not None, "tile pads are required when lowering Pad nodes"
+        assert len(new_inputs) >= 2, "Pad node must have a pads input"
+        new_inputs[1] = _make_pad_constant_for_tile(
+            node,
+            hw_pads,
+            f"{scope_prefix}{node_base_name}_pads_s{split_id[0]}_{split_id[1]}",
+        )
 
     new_node = gs.Node(
         name=f"{scope_prefix}{node_base_name}_split_s{split_id[0]}_{split_id[1]}",

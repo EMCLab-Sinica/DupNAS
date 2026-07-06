@@ -1,0 +1,13 @@
+model_name,onnx,input_shape,layout,input_size,num_images,top1_acc,top5_acc,provider
+shuffle-im100-vm128-dupnas_w0.5_ir128.onnx,genonnx/shuffle/shuffle-im100-vm128-dupnas_w0.5_ir128.onnx,"[1, 3, 128, 128]",NCHW,128,200,69.5,90.5,CPUExecutionProvider
+shuffle-im100-vm128-nots_w0.5_ir64.onnx,genonnx/shuffle/shuffle-im100-vm128-nots_w0.5_ir64.onnx,"[1, 3, 64, 64]",NCHW,64,200,67.0,90.0,CPUExecutionProvider
+shuffle-im100-vm128-patchts_w0.5_ir96.onnx,genonnx/shuffle/shuffle-im100-vm128-patchts_w0.5_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,68.0,91.0,CPUExecutionProvider
+shuffle-im100-vm128-tinyts_w0.5_ir96.onnx,genonnx/shuffle/shuffle-im100-vm128-tinyts_w0.5_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,68.0,92.5,CPUExecutionProvider
+shuffle-im100-vm256-dupnas_w0.8_ir96.onnx,genonnx/shuffle/shuffle-im100-vm256-dupnas_w0.8_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,68.5,92.5,CPUExecutionProvider
+shuffle-im100-vm256-nots_w0.5_ir96.onnx,genonnx/shuffle/shuffle-im100-vm256-nots_w0.5_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,68.5,90.0,CPUExecutionProvider
+shuffle-im100-vm256-patchts_w0.5_ir128.onnx,genonnx/shuffle/shuffle-im100-vm256-patchts_w0.5_ir128.onnx,"[1, 3, 128, 128]",NCHW,128,200,67.0,93.0,CPUExecutionProvider
+shuffle-im100-vm256-tinyts_w0.8_ir96.onnx,genonnx/shuffle/shuffle-im100-vm256-tinyts_w0.8_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,68.5,92.5,CPUExecutionProvider
+shuffle-im100-vm96-dupnas_w0.5_ir128.onnx,genonnx/shuffle/shuffle-im100-vm96-dupnas_w0.5_ir128.onnx,"[1, 3, 128, 128]",NCHW,128,200,69.5,91.0,CPUExecutionProvider
+shuffle-im100-vm96-nots_w0.5_ir32.onnx,genonnx/shuffle/shuffle-im100-vm96-nots_w0.5_ir32.onnx,"[1, 3, 32, 32]",NCHW,32,200,61.0,86.0,CPUExecutionProvider
+shuffle-im100-vm96-patchts_w0.5_ir96.onnx,genonnx/shuffle/shuffle-im100-vm96-patchts_w0.5_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,67.5,89.0,CPUExecutionProvider
+shuffle-im100-vm96-tinyts_w0.5_ir96.onnx,genonnx/shuffle/shuffle-im100-vm96-tinyts_w0.5_ir96.onnx,"[1, 3, 96, 96]",NCHW,96,200,67.0,92.0,CPUExecutionProvider
