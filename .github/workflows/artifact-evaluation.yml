@@ -8,6 +8,7 @@ on:
         required: true
         options:
           - fig6
+          - fig7
           - fig8
           - fig9
           - fig10
@@ -37,6 +38,22 @@ jobs:
           path: |
             DupNAS/sample_onnx/outputs/*_vm*_detail.csv
             DupNAS/sample_onnx/outputs/*_vm*_summary.csv
+  fig7:
+    if: ${{ inputs.task == 'fig7' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig7
+        run: bash scripts/fig7.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: DupNAS/genonnx/onnx_image100_accuracy_${{ inputs.option }}_test.csv
   fig8:
     if: ${{ inputs.task == 'fig8' }}
     runs-on: [self-hosted, ae-machine]
