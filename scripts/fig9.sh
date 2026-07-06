@@ -2,9 +2,9 @@ set -euo pipefail
 
 [[ "$OPTION" =~ ^(shufflenet|mobilenet|inception)$ ]] || { echo "Error: Invalid OPTION"; exit 1; }
 
-MODEL="$OPTION"
+MODEL="${BASH_REMATCH[1]}"
 
-echo "Executing Model: $MODEL..."
+echo "Running model: $MODEL..."
 
 cd DupNAS/TStime
 bash random_run_TStime.sh "$MODEL" python3.9 0

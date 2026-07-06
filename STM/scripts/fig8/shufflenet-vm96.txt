@@ -1,0 +1,5 @@
+shuffle-im100-vm96-DupNAS-MC-13_w0.5_ir128_split_full_integer_quant.tflite
+shuffle-im100-vm96-DupNAS-MC-14_w0.5_ir128_split_full_integer_quant.tflite
+shuffle-im100-vm96-DupNAS-MC-6_w0.5_ir128_split_full_integer_quant.tflite
+shuffle-im100-vm96-DupNAS-MC-8_w0.5_ir128_split_full_integer_quant.tflite
+shuffle-im100-vm96-dupnas_w0.5_ir128_split_full_integer_quant.tflite

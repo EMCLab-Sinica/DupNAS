@@ -1,7 +1,7 @@
 set -euo pipefail
 
-if [ -z "$1" ]; then
-    echo "usage: $0 MODELS_TXT"
+if [ $# -lt 2 ]; then
+    echo "usage: $0 MODELS_TXT flash,ram,latency,accuracy"
     exit 1
 fi
 
@@ -9,31 +9,44 @@ export PATH="/opt/st/stm32cubeide_2.1.1/plugins/com.st.stm32cube.ide.mcu.externa
 STEDGEAI="/opt/ST/STEdgeAI/4.0/Utilities/linux/stedgeai"
 PROGRAMMER="/opt/st/stm32cubeide_2.1.1/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.2.400.202601091506/tools/bin/STM32_Programmer_CLI"
 
-PROJECT_DIR="stm_projects/cubeai_f7"
-MY_MODEL_NAME_FILE="$PROJECT_DIR/Core/Inc/my_model_name.h"
+PROJECT_DIR="stm_projects/cubeai_h7"
+MY_MODEL_NAME_FILE="$PROJECT_DIR/CM7/Core/Inc/my_model_name.h"
 MEMPOOL_FILE="$PROJECT_DIR/.ai/mempools.json"
-BUILD_DIR="$PROJECT_DIR/STM32CubeIDE/Release"
-ELF_FILE="$BUILD_DIR/manual.elf"
+BUILD_DIR="$PROJECT_DIR/STM32CubeIDE/CM7/Release"
+ELF_FILE="$BUILD_DIR/manual_h7_CM7.elf"
 
-SERIAL_NUMBER="066EFF535570514867224209"
-TTY_DEVICE="/dev/ttyACM0"
+SERIAL_NUMBER="0021002A3133510837363734"
+TTY_DEVICE="/dev/ttyACM1"
 
 MODELS_TXT="$1"
+METRICS="$2"
 ONNX_MODELS_DIR="onnx_models"
 TFLM_MODELS_DIR="tflm-template/src/models"
-RESULTS_DIR="$PWD/results/cubeai_f7"
+RESULTS_DIR="$PWD/results/cubeai_h7"
 RESULTS_CSV="$RESULTS_DIR/results.csv"
+ACCURACY_CSV="$(dirname "$0")/accuracy.csv"
 
 BATCH_SIZE="1"
 OPT="balanced"
 NAME="network"
 VERBOSITY="1"
 C_API="st-ai"
-TARGET="stm32f7"
+TARGET="stm32h7"
 
 rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
-echo "model_name,flash,ram,latency" > "$RESULTS_CSV"
+echo "model_name,$METRICS" > "$RESULTS_CSV"
+
+scale_metric() {
+    [ "$1" = "NA" ] && echo "NA" || awk -v value="$1" 'BEGIN {printf "%.3f\n", value / 1000}'
+}
+
+metric_unit() {
+    case "$1" in
+        flash|ram) echo "KB" ;;
+        latency) echo "s" ;;
+    esac
+}
 
 run_model() {
     local MODEL_FILE="$1"
@@ -106,17 +119,36 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
 
     kill "$RECORD_PID"
 
-    FLASH=$(grep "weights (ro)" "$HOST_LOG" | awk '{print $4}' | tr -d ",")
+    FLASH=$(grep "weights (ro)" "$HOST_LOG" | awk '{print $4}' | tr -d "," || true)
     FLASH=${FLASH:-NA}
+    FLASH=$(scale_metric "$FLASH")
 
-    RAM=$(grep "activations (rw)" $HOST_LOG | awk '{print $4}' | tr -d ",")
+    RAM=$(grep "activations (rw)" "$HOST_LOG" | awk '{print $4}' | tr -d "," || true)
     RAM=${RAM:-NA}
+    RAM=$(scale_metric "$RAM")
 
-    LATENCY=$(grep "duration DWT" $BOARD_LOG | awk '{print $5}')
+    LATENCY=$(grep "duration DWT" "$BOARD_LOG" | awk '{print $5}' || true)
     LATENCY=${LATENCY:-NA}
+    LATENCY=$(scale_metric "$LATENCY")
 
-    echo "flash: $FLASH, ram: $RAM, latency: $LATENCY"
-    echo "$MODEL_NAME,$FLASH,$RAM,$LATENCY" >> "$RESULTS_CSV"
+    ACCURACY_NAME="${MODEL_NAME%_full_integer_quant}"
+    ACCURACY_NAME="${ACCURACY_NAME%_quantized}"
+    ACCURACY=$(awk -F, -v model="$ACCURACY_NAME" '$1 == model {print $2; exit}' "$ACCURACY_CSV" || true)
+    ACCURACY=${ACCURACY:-NA}
+
+    ROW="$MODEL_NAME"
+    SUMMARY=""
+    for METRIC in ${METRICS//,/ }; do
+        VAR="${METRIC^^}"
+        VALUE="${!VAR}"
+        UNIT=$(metric_unit "$METRIC")
+        DISPLAY="${VALUE}${UNIT:+ $UNIT}"
+        ROW="$ROW,$VALUE"
+        SUMMARY="${SUMMARY:+$SUMMARY, }$METRIC: $DISPLAY"
+    done
+
+    echo "$SUMMARY"
+    echo "$ROW" >> "$RESULTS_CSV"
 done < "$MODELS_TXT"
 
-echo "All jobs finished."
+echo "Completed. Results saved to $RESULTS_CSV"

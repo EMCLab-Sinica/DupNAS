@@ -7,9 +7,10 @@ on:
         type: choice
         required: true
         options:
-          - test
           - fig6
+          - fig8
           - fig9
+          - fig10
           - fig11
       option:
         type: string
@@ -18,18 +19,6 @@ on:
         type: string
         required: true
 jobs:
-  test:
-    if: ${{ inputs.task == 'test' }}
-    runs-on: [self-hosted, ae-machine]
-    env:
-      OPTION: ${{ inputs.option }}
-    defaults:
-      run:
-        working-directory: STM/
-    steps:
-      - uses: actions/checkout@v6
-      - name: Run test
-        run: bash test.sh "$OPTION"
   fig6:
     if: ${{ inputs.task == 'fig6' }}
     runs-on: [self-hosted, ae-server]
@@ -40,7 +29,35 @@ jobs:
       - name: Link models
         run: bash scripts/link_models.sh
       - name: Run fig6
-        run: bash scripts/fig6.sh "$OPTION"
+        run: bash scripts/fig6.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: |
+            DupNAS/sample_onnx/outputs/*_vm*_detail.csv
+            DupNAS/sample_onnx/outputs/*_vm*_summary.csv
+  fig8:
+    if: ${{ inputs.task == 'fig8' }}
+    runs-on: [self-hosted, ae-machine]
+    env:
+      OPTION: ${{ inputs.option }}
+    defaults:
+      run:
+        working-directory: STM/
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reset USB devices
+        run: bash scripts/reset_usb.sh
+      - name: Patch repository root
+        run: bash scripts/patch_repo_root.sh
+      - name: Run fig8
+        run: bash scripts/fig8/fig8.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: STM/results/
   fig9:
     if: ${{ inputs.task == 'fig9' }}
     runs-on: [self-hosted, ae-server]
@@ -51,7 +68,30 @@ jobs:
       - name: Link models
         run: bash scripts/link_models.sh
       - name: Run fig9
-        run: bash scripts/fig9.sh "$OPTION"
+        run: bash scripts/fig9.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: |
+            DupNAS/TStime/*/*_random100_seed*_all_vm_runtime_ms.txt
+            DupNAS/TStime/*_random100_seed*_300runs_summary.csv
+  fig10:
+    if: ${{ inputs.task == 'fig10' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig10
+        run: bash scripts/fig10.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: DupNAS/HEtest/allseed_report_summary_*.csv
   fig11:
     if: ${{ inputs.task == 'fig11' }}
     runs-on: [self-hosted, ae-machine]
@@ -63,14 +103,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Reset USB devices
-        run: bash utils/reset_usb.sh
+        run: bash scripts/reset_usb.sh
       - name: Patch repository root
-        run: bash utils/patch_repo_root.sh
+        run: bash scripts/patch_repo_root.sh
       - name: Gather TFLM memory usage
         if: ${{ contains(inputs.option, 'tflm') }}
-        run: bash utils/gather_tflm_mem.sh
+        run: bash scripts/gather_tflm_mem.sh
       - name: Run fig11
-        run: bash fig11.sh "$OPTION"
+        run: bash scripts/fig11/fig11.sh
       - name: Upload results
         uses: actions/upload-artifact@v7
         with:

@@ -2,10 +2,10 @@ set -euo pipefail
 
 [[ "$OPTION" =~ ^(shufflenet|mobilenet|inception)-vm(96|128|256)$ ]] || { echo "Error: Invalid OPTION"; exit 1; }
 
-MODEL="${OPTION%-vm*}"
-VM="${OPTION#*-vm}"
+MODEL="${BASH_REMATCH[1]}"
+VM="${BASH_REMATCH[2]}"
 
-echo "Executing Model: $MODEL, VM: $VM..."
+echo "Running model: $MODEL, VM: $VM..."
 
 cd "DupNAS/sample_onnx/$MODEL"
 bash "run_allsamples_vm${VM}.sh" ../outputs python3.9
