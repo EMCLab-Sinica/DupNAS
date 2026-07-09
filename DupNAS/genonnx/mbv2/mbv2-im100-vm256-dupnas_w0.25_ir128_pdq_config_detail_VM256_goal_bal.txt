@@ -1,13 +1,13 @@
 under_mem:True
-peak node list:[6, 7, 8, 18, 19, 20, 30, 31, 32, 9, 5, 21, 33, 1, 17, 29, 0]
-Full_duration:2.026329755783081(s)
-Peak memory for all: : 215040 bytes (210 KB)
-Peak memory under dup: : 215040 bytes (210 KB)
-ori MAC: 1685815296
-ori weight access: 11328216
+peak node list:[6, 7, 8, 18, 19, 20, 1, 0, 9, 5]
+Full_duration:1.501007318496704(s)
+Peak memory for all: : 245760 bytes (240 KB)
+Peak memory under dup: : 245760 bytes (240 KB)
+ori MAC: 792428544
+ori weight access: 5294520
 
-Total MAC increased: 160026624
-Total weight access increased: 722016
+Total MAC increased: 53710848
+Total weight access increased: 241248
 
 The useful subgraphs idx: [0, 1, 2, 3]
 remaining_peaks: []
@@ -16,8 +16,8 @@ Total PDQ Configuration Details
 ========================================
 Subgraph #1
   Subgraph Ops: [4, 5, 6, 7, 8, 9, 10]
-  Original Peak Memory: 811008
-  Optimized Peak Memory: 215040
+  Original Peak Memory: 548864
+  Optimized Peak Memory: 149504
   Peak Operator Index: 6
   Duplication Config:
     under memory constraint: True
@@ -25,36 +25,36 @@ Subgraph #1
     d_candidate_num: [[4, 5, 6, 7, 8, 9, 10]]
     Selected q: 4
     q_candidates: [2, 4, 8, 16, 32]
-    Total Memory Under q: [30720, 104448, 196608, 196608, 196608, 104448, 24576, 30720, 110592, 202752, 202752, 202752, 110592, 24576, 30720, 116736, 208896, 208896, 208896, 116736, 24576, 30720, 122880, 215040, 215040, 215040, 122880, 24576]
-    Final Peak Memory: 215040
+    Total Memory Under q: [30720, 71680, 131072, 131072, 131072, 71680, 24576, 30720, 77824, 137216, 137216, 137216, 77824, 24576, 30720, 83968, 143360, 143360, 143360, 83968, 24576, 30720, 90112, 149504, 149504, 149504, 90112, 24576]
+    Final Peak Memory: 149504
 ----------------------------------------
 Subgraph #2
-  Subgraph Ops: [16, 17, 18, 19, 20, 21, 22]
-  Original Peak Memory: 614400
-  Optimized Peak Memory: 165888
+  Subgraph Ops: [17, 18, 19]
+  Original Peak Memory: 417792
+  Optimized Peak Memory: 245760
   Peak Operator Index: 18
   Duplication Config:
     under memory constraint: True
-    Selected d: [16, 17, 18, 19, 20, 21, 22]
-    d_candidate_num: [[16, 17, 18, 19, 20, 21, 22]]
+    Selected d: [17, 18, 19]
+    d_candidate_num: 1
     Selected q: 4
     q_candidates: [2, 4, 8, 16, 32]
-    Total Memory Under q: [30720, 79872, 147456, 147456, 147456, 79872, 24576, 30720, 86016, 153600, 153600, 153600, 86016, 24576, 30720, 92160, 159744, 159744, 159744, 92160, 24576, 30720, 98304, 165888, 165888, 165888, 98304, 24576]
-    Final Peak Memory: 165888
+    Total Memory Under q: [73728, 116736, 116736, 116736, 159744, 159744, 159744, 202752, 202752, 202752, 245760, 245760]
+    Final Peak Memory: 245760
 ----------------------------------------
 Subgraph #3
-  Subgraph Ops: [28, 29, 30, 31, 32, 33, 34]
-  Original Peak Memory: 614400
-  Optimized Peak Memory: 165888
-  Peak Operator Index: 30
+  Subgraph Ops: [20, 21]
+  Original Peak Memory: 417792
+  Optimized Peak Memory: 245760
+  Peak Operator Index: 20
   Duplication Config:
     under memory constraint: True
-    Selected d: [28, 29, 30, 31, 32, 33, 34]
-    d_candidate_num: [[28, 29, 30, 31, 32, 33, 34]]
+    Selected d: [20, 21]
+    d_candidate_num: 1
     Selected q: 4
     q_candidates: [2, 4, 8, 16, 32]
-    Total Memory Under q: [30720, 79872, 147456, 147456, 147456, 79872, 24576, 30720, 86016, 153600, 153600, 153600, 86016, 24576, 30720, 92160, 159744, 159744, 159744, 92160, 24576, 30720, 98304, 165888, 165888, 165888, 98304, 24576]
-    Final Peak Memory: 165888
+    Total Memory Under q: [245760, 202752, 202752, 159744, 159744, 116736, 116736, 73728]
+    Final Peak Memory: 245760
 ----------------------------------------
 Subgraph #4
   Subgraph Ops: [0, 1, 2]
