@@ -1,4 +1,4 @@
 model,top1_accuracy,top5_accuracy
-incept-im100-vm128-dupnas_w0.5_ir128.onnx,62.80%,85.04%
-incept-im100-vm256-dupnas_w0.75_ir128.onnx,66.72%,89.04%
-incept-im100-vm96-dupnas_w0.75_ir96.onnx,59.68%,84.48%
+incept-im100-vm128-dupnas_w0.5_ir128.onnx,64.16%,85.92%
+incept-im100-vm256-dupnas_w0.75_ir128.onnx,68.24%,88.96%
+incept-im100-vm96-dupnas_w0.75_ir96.onnx,61.84%,85.20%

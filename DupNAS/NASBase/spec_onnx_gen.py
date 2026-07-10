@@ -10,6 +10,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import torch
 import onnx
+import onnxruntime as ort
 import re, ast
 import csv
 
@@ -157,6 +158,11 @@ else:
         os.makedirs(onnx_path, exist_ok=True)
 
         for idx, (name, cpb) in enumerate(cpb_tuples):
+            # Only export/check DupNAS models for now.
+            if "dupnas" not in name.lower():
+                print(f"[SKIP] Non-DupNAS model: {name}")
+                continue
+
             try:
                 ckptname = f"{name}_supernet_{Settings.NAS_SETTINGS_GENERAL['ARC']}_best-fine-tuned.pth"
                 print(f"[INFO] Loading subnet-specific supernet: {ckptname}")
@@ -192,9 +198,68 @@ else:
                     continue
 
                 each_subnet_config = subcfgs[0]
-                each_subnet = build_finetuned_subnet_from_supernet(supernet, each_subnet_config)
+                each_subnet = build_finetuned_subnet_from_supernet(
+                    supernet,
+                    each_subnet_config,
+                )
                 each_subnet.eval()
                 subnet_name = getattr(each_subnet, "name", name)
+
+                # ---------------------------------------------------------
+                # CHECK 1: fine-tuned supernet path vs extracted subnet
+                # ---------------------------------------------------------
+                choice_ixs = [
+                    supernet.blk_choices.index(list(block_choice))
+                    for block_choice in each_subnet.choice_per_block
+                ]
+
+                print("[CHECK] Requested CPB:", cpb)
+                print("[CHECK] Extracted subnet CPB:", each_subnet.choice_per_block)
+                print("[CHECK] Supernet choice indexes:", choice_ixs)
+
+                supernet_device = next(supernet.parameters()).device
+                check_input = net_input.to(supernet_device)
+
+                supernet.eval()
+                each_subnet = each_subnet.to(supernet_device)
+                each_subnet.eval()
+
+                with torch.no_grad():
+                    supernet_output = supernet(check_input, choice_ixs)
+                    subnet_output = each_subnet(check_input)
+
+                supernet_output_cpu = supernet_output.detach().cpu()
+                subnet_output_cpu = subnet_output.detach().cpu()
+
+                supernet_subnet_abs_diff = (
+                    supernet_output_cpu - subnet_output_cpu
+                ).abs()
+
+                supernet_subnet_max_diff = (
+                    supernet_subnet_abs_diff.max().item()
+                )
+                supernet_subnet_mean_diff = (
+                    supernet_subnet_abs_diff.mean().item()
+                )
+
+                print(
+                    "[CHECK] Supernet vs subnet max abs diff: "
+                    f"{supernet_subnet_max_diff:.10f}"
+                )
+                print(
+                    "[CHECK] Supernet vs subnet mean abs diff: "
+                    f"{supernet_subnet_mean_diff:.10f}"
+                )
+
+                if supernet_subnet_max_diff > 1e-5:
+                    raise RuntimeError(
+                        "Extracted subnet does not numerically match the "
+                        "fine-tuned supernet path. "
+                        f"max_abs_diff={supernet_subnet_max_diff:.10f}, "
+                        f"choice_ixs={choice_ixs}, cpb={cpb}"
+                    )
+
+                print("[CHECK] Supernet and extracted subnet match.")
 
                 print(f"[INFO] Exporting fine-tuned subnet: wm={width_multiplier}, ir={input_resolution}, name={subnet_name}")
 
@@ -214,20 +279,52 @@ else:
                 model_name = f"{subnet_name}_w{width_multiplier}_ir{input_resolution}"
                 onnx_file = os.path.join(onnx_path, model_name + ".onnx")
 
+                # Export from CPU to avoid device-dependent export behavior.
+                each_subnet = each_subnet.cpu()
+                export_input = net_input.detach().cpu()
+
+                # Family-specific ONNX export settings:
+                #   ShuffleNet / MobileNetV2: opset 11 + constant folding
+                #   Inception:                opset 13 + no constant folding
+                model_family = Settings.NAS_SETTINGS_GENERAL["ARC"].lower()
+
+                if model_family in {"shuffle", "mbv2"}:
+                    export_opset = 11
+                    export_constant_folding = True
+                elif model_family == "incept":
+                    export_opset = 11
+                    export_constant_folding = True
+                else:
+                    raise ValueError(
+                        f"Unsupported model family for ONNX export: {model_family}"
+                    )
+
                 torch.onnx.export(
                     each_subnet,
-                    net_input,
+                    export_input,
                     onnx_file,
                     input_names=["input"],
                     output_names=["output"],
                     export_params=True,
-                    opset_version=11,
-                    do_constant_folding=True,
+                    opset_version=export_opset,
+                    do_constant_folding=export_constant_folding,
+                    training=torch.onnx.TrainingMode.EVAL,
                     # dynamic_axes={
                     #     "input": {0: "batch_size"},
                     #     "output": {0: "batch_size"},
                     # },
                 )
+
+                # Recompute the PyTorch reference after export. Some exporters
+                # may temporarily alter module state during tracing.
+                each_subnet.eval()
+                with torch.no_grad():
+                    pytorch_export_output = (
+                        each_subnet(export_input)
+                        .detach()
+                        .cpu()
+                        .numpy()
+                    )
 
                 if not os.path.exists(onnx_file) or os.path.getsize(onnx_file) < 10_000:
                     print(f"[*] ONNX too small or missing: {onnx_file}")
@@ -244,6 +341,51 @@ else:
                 try:
                     onnx_model = onnx.load(onnx_file)
                     onnx.checker.check_model(onnx_model)
+
+                    # -----------------------------------------------------
+                    # CHECK 2: extracted PyTorch subnet vs exported ONNX
+                    # -----------------------------------------------------
+                    ort_session = ort.InferenceSession(
+                        onnx_file,
+                        providers=["CPUExecutionProvider"],
+                    )
+                    ort_input_name = ort_session.get_inputs()[0].name
+
+                    onnx_output = ort_session.run(
+                        None,
+                        {
+                            ort_input_name: export_input.numpy().astype(
+                                np.float32,
+                                copy=False,
+                            )
+                        },
+                    )[0]
+
+                    onnx_abs_diff = np.abs(
+                        pytorch_export_output - onnx_output
+                    )
+                    subnet_onnx_max_diff = float(onnx_abs_diff.max())
+                    subnet_onnx_mean_diff = float(onnx_abs_diff.mean())
+
+                    print(
+                        "[CHECK] Subnet vs ONNX max abs diff: "
+                        f"{subnet_onnx_max_diff:.10f}"
+                    )
+                    print(
+                        "[CHECK] Subnet vs ONNX mean abs diff: "
+                        f"{subnet_onnx_mean_diff:.10f}"
+                    )
+
+                    if subnet_onnx_max_diff > 1e-4:
+                        raise RuntimeError(
+                            "Exported ONNX output does not numerically match "
+                            "the extracted PyTorch subnet. "
+                            f"max_abs_diff={subnet_onnx_max_diff:.10f}, "
+                            f"onnx={onnx_file}"
+                        )
+
+                    print("[CHECK] Extracted subnet and ONNX match.")
+
                 except Exception as e:
                     print(f"[*] ONNX check failed: {onnx_file}\n    {e}")
                     summary_rows.append({

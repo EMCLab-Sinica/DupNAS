@@ -1,4 +1,4 @@
- Full_duration: 1.7952880859375(s)
+ Full_duration: 1.793278455734253(s)
  Peak node list:[1, 0]
 ----------------------------------------
  Patch selected by min latency/comp: 

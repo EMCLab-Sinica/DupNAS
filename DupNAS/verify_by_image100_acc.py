@@ -58,6 +58,27 @@ MODEL_DIRS = [
 ]
 
 
+
+def create_ort_session(onnx_path: Path, providers):
+    """
+    Create an ONNX Runtime session with graph optimizations disabled.
+
+    Inception models were verified to match PyTorch numerically only when
+    ORT graph optimization was disabled. The exported ONNX graph itself is
+    correct; the default optimized ORT execution changes the final result.
+    """
+    session_options = ort.SessionOptions()
+    session_options.graph_optimization_level = (
+        ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+    )
+
+    return ort.InferenceSession(
+        str(onnx_path),
+        sess_options=session_options,
+        providers=providers,
+    )
+
+
 def parse_ir_from_name(path: Path):
     """Example: shuffle-im100-vm96-dupnas_w0.5_ir128.onnx -> 128"""
     m = re.search(r"_ir(\d+)", path.stem)
@@ -224,7 +245,7 @@ def evaluate_onnx_on_loader(
     else:
         providers = ["CPUExecutionProvider"]
 
-    session = ort.InferenceSession(str(onnx_path), providers=providers)
+    session = create_ort_session(onnx_path, providers)
     input_name, input_shape, layout, inferred_size, fixed_batch = get_input_info(session, onnx_path)
     input_size = forced_input_size if forced_input_size is not None else inferred_size
     output_names = [o.name for o in session.get_outputs()]
@@ -389,7 +410,7 @@ def main():
 
             try:
                 # Open once to infer input size before constructing get_dataset().
-                tmp_session = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
+                tmp_session = create_ort_session(onnx_path, ["CPUExecutionProvider"])
                 _input_name, _input_shape, _layout, inferred_size, _fixed_batch = get_input_info(tmp_session, onnx_path)
                 del tmp_session
 
