@@ -117,7 +117,7 @@ Below is a brief description of the main directories and files in this repositor
    bash convert.sh mbv2
    bash convert.sh incept
    ```
-   The conversion uses [onnx2tf](https://github.com/PINTO0309/onnx2tf) to generate integer-quantized TensorFlow Lite Micro models, such as:
+   The conversion uses [onnx2tf](https://github.com/PINTO0309/onnx2tf) to generate integer-quantized TensorFlow Lite models, such as:
    ```text
    xxx_full_integer_quant.tflite
    ```
@@ -125,7 +125,7 @@ Below is a brief description of the main directories and files in this repositor
    
 ### ⚙️ Setup and building TFLite-Micro
 
-1. Copy the converted TFLite-Micro model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
+1. Copy the converted TFLite model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
 2. Follow [Tflm-engine/README.md](Inference/Tflm-engine/README.md) to build the TFLite-Micro static library (`libtensorflow-microlite.a`).
 3. Add the generated static library to your STM32CubeIDE project settings. Then include `Tflm-engine/src/tflm_main.h` and call `tflm_main_xxx` to run inference for the target model.
 
