@@ -45,7 +45,7 @@ Below is a brief description of the main directories and files in this repositor
 - Install the required Python packages listed in `requirements.txt` with:
   `python3.9 -m pip install -r requirements.txt`
 - [Anaconda](https://www.anaconda.com/docs/getting-started/anaconda/install/overview) (recommended for managing Python environments).
-- [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data) dataset. Load the dataset from: `https://www.kaggle.com/datasets/ambityga/imagenet100`.
+- [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data) dataset. 
 - [STM32F746NG MCU](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) deployment device.
 - [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) development tools for the STM32.
 - [TensorFlow Lite Micro](https://github.com/tensorflow/tflite-micro) inference engine.
@@ -71,12 +71,6 @@ Below is a brief description of the main directories and files in this repositor
      chmod 600 ~/.kaggle/access_token
      ```
    The dataset is downloaded and prepared automatically when DupNAS is run for the first time stage 2.
-
-
-  - go to https://www.kaggle.com/datasets/ambityga/imagenet100
-  - generage a Kaggle api token
-  - `export KAGGLE_API_TOKEN= <Your token>`
-  - ` mkdir -p ~/.kaggle && echo <Your token> > ~/.kaggle/access_token && chmod 600 ~/.kaggle/access_token`
 4. Copy the configuration file for the target architecture and run DupNAS:
    ```bash
    cp settings/settings-<arc>.py settings.py
