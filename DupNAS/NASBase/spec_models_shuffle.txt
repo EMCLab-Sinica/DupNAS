@@ -1,8 +1,7 @@
 
-# foramtting
+# foramtting for new models
 # Extract from best_solution_info.json: supernet config=[width multiplier, input resolution], subnet_choice_per_blk
-# wm= <width multiplier>, ir= <input resolution>, name= <shuffle>, cpb=<subnet_choice_per_blk>
-
+# wm= <width multiplier>, ir= <input resolution>, name= <onnxname>, cpb=<subnet_choice_per_blk>
 
 
 
