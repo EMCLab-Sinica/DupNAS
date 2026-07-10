@@ -97,26 +97,20 @@ Below is a brief description of the main directories and files in this repositor
   | `--suffix` | Experiment suffix for naming outputs. Use the same suffix for all four stages. | user-defined string |
   
 5. After completing Stages 1–4, extract the selected network configuration, the final solution is saved in `/DupNAS/NASBase/train_log/<suffix>_best_solution.json`
-6. ONNX generation and tensor-splitting conversion are integrated into the model-converter workflow. Continue with Steps in the next section.
+6. ONNX generation and tensor-splitting conversion are integrated into the model-converter workflow. Continue with steps in the next section.
 
 
 ### ✂️ Setup and running the model converter
 1. Copy the configurations `"supernet config"` and `"subnet_choice_per_blk"` from: `<suffix>_best_solution.json`, into: `/DupNAS/NASBase/spec_model_<arc>.txt`.
 2. Go to `/DupNAS/`, then run the corresponding script to generate the selected ONNX models: 
-  ```bash
-  bash gen_selected_shuffle.sh
-  bash gen_selected_mbv2.sh
-  bash gen_selected_incept.sh
-  ```
+   ```bash
+   bash gen_selected_shuffle.sh
+   bash gen_selected_mbv2.sh
+   bash gen_selected_incept.sh
+   ```
 3. The generated models are saved in the following locations:
-   * Original selected ONNX models:
-     ```text
-     /DupNAS/genonnx/<arc>/
-     ```
-   * Tensor-split ONNX models:
-     ```text
-     /Inference/Model-converter/ts_converted/<arc>/
-     ```
+   * Original selected ONNX models: `/DupNAS/genonnx/<arc>/`
+   * Tensor-split ONNX models: `/Inference/Model-converter/ts_converted/<arc>/`
 4. Go to the `/Inference/onnx-to-tflite/` directory and run the corresponding conversion command:
    ```bash
    bash convert.sh shuffle
