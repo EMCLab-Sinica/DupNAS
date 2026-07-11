@@ -1,0 +1,17 @@
+.git
+__pycache__
+*.pyc
+*.log
+
+data/
+datasets/
+checkpoints/
+outputs/
+results/
+genonnx/
+
+*.onnx
+*.pth
+*.pt
+*.tar
+*.zip

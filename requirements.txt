@@ -74,8 +74,8 @@ zipp==3.7.0
 
 tqdm==4.65.0
 pandas==2.0.2
-torch==1.11.0+cu115
-torchvision==0.12.0+cu115
+#torch==1.11.0+cu115
+#torchvision==0.12.0+cu115
 matplotlib==3.7.1
 mplcursors==0.5.2
 pyqt5==5.15.9
