@@ -92,8 +92,8 @@ jobs:
         with:
           name: results
           path: |
-            DupNAS/TStime/*/*_random100_seed*_all_vm_runtime_ms.txt
-            DupNAS/TStime/*_random100_seed*_300runs_summary.csv
+            DupNAS/TStime/*/*_sample*_seed*_all_vm_runtime_ms.txt
+            DupNAS/TStime/*_total*runs_summary.csv
   fig10:
     if: ${{ inputs.task == 'fig10' }}
     runs-on: [self-hosted, ae-server]
