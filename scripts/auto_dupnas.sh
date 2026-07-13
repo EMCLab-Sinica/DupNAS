@@ -5,11 +5,11 @@ set -euo pipefail
 OPTION="${1:-${OPTION:-}}"
 
 case "${OPTION}" in
-  stage1|stage2|stage3|stage4|full-stage)
+  stage1+2|stage3+4|full-stage)
     ;;
   *)
     echo "Error: Invalid OPTION: '${OPTION}'"
-    echo "Valid options: stage1, stage2, stage3, stage4, full-stage"
+    echo "Valid options: stage1+2, stage3+4, full-stage"
     exit 1
     ;;
 esac
@@ -31,7 +31,7 @@ SUFFIX="aetest"
 # =========================
 PERSIST_TRAIN_LOG="/4TB/aeuser/DupNAS-AE/DupNAS/NASBase/train_log"
 
-# These paths are relative to DupNAS/, after "cd DupNAS/"
+# Paths relative to DupNAS/, after "cd DupNAS/"
 LOCAL_TRAIN_LOG="NASBase/train_log"
 LOCAL_CKPT_LOG="NASBase/checkpoints"
 
@@ -84,20 +84,21 @@ restore_supernet_files() {
   local local_result="${LOCAL_TRAIN_LOG}/${result_name}"
   local local_ckpt="${LOCAL_CKPT_LOG}/${ckpt_name}"
 
-  # Copy result JSON
+  # Copy Stage 2 result JSON
   copy_required_file \
     "${persist_result}" \
     "${LOCAL_TRAIN_LOG}"
 
-  # Copy supernet checkpoint
+  # Copy Stage 2 supernet checkpoint
   copy_required_file \
     "${persist_ckpt}" \
     "${LOCAL_CKPT_LOG}"
 
-  # Convert checkpoint path to an absolute path in the current runner workspace
+  # Get absolute path in the current GitHub Actions workspace
+  local local_ckpt_abs
   local_ckpt_abs="$(realpath "${local_ckpt}")"
 
-  # Rewrite the absolute checkpoint path stored in the copied JSON
+  # Rewrite the checkpoint path stored in the copied JSON
   python3.9 - "${local_result}" "${local_ckpt_abs}" <<'PY'
 import json
 import sys
@@ -124,52 +125,18 @@ PY
   echo "  CKPT: ${local_ckpt_abs}"
 }
 
-restore_stage_files() {
+restore_stage3_prerequisites() {
   echo "=============================="
-  echo "Restoring prerequisite files"
+  echo "Restoring Stage 1/2 prerequisites"
   echo "=============================="
 
-  case "${OPTION}" in
-    stage1)
-      # No prerequisite files needed
-      ;;
+  # Stage 1 output
+  copy_required_file \
+    "${PERSIST_TRAIN_LOG}/${SUFFIX}_ssoptlog.json" \
+    "${LOCAL_TRAIN_LOG}"
 
-    stage2)
-      # Stage 2 requires Stage 1 output
-      copy_required_file \
-        "${PERSIST_TRAIN_LOG}/${SUFFIX}_ssoptlog.json" \
-        "${LOCAL_TRAIN_LOG}"
-      ;;
-
-    stage3)
-      # Stage 3 requires:
-      #   1. Stage 1 search-space optimization result
-      #   2. Stage 2 supernet result JSON
-      #   3. Stage 2 supernet checkpoint
-      copy_required_file \
-        "${PERSIST_TRAIN_LOG}/${SUFFIX}_ssoptlog.json" \
-        "${LOCAL_TRAIN_LOG}"
-
-      restore_supernet_files
-      ;;
-
-    stage4)
-      # Stage 4 requires:
-      #   1. Stage 1 search-space optimization result
-      #   2. Stage 2 supernet result JSON
-      #   3. Stage 2 supernet checkpoint
-      #   4. Stage 3 evolutionary-search result
-      copy_required_file \
-        "${PERSIST_TRAIN_LOG}/${SUFFIX}_ssoptlog.json" \
-        "${LOCAL_TRAIN_LOG}"
-
-      restore_supernet_files
-
-      copy_required_file \
-        "${PERSIST_TRAIN_LOG}/${SUFFIX}_evosearchlog.json" \
-        "${LOCAL_TRAIN_LOG}"
-      ;;
-  esac
+  # Stage 2 result JSON + supernet checkpoint
+  restore_supernet_files
 
   echo "Prerequisite restoration completed."
 }
@@ -269,28 +236,33 @@ run_stage4() {
 # Run selected option
 # =========================
 case "${OPTION}" in
-  stage1)
+  stage1+2)
+    # Stage 2 directly uses the Stage 1 output generated
+    # in the same GitHub Actions workspace.
     run_stage1
-    ;;
-
-  stage2)
-    restore_stage_files
     run_stage2
+
+    echo "=============================="
+    echo "Stages 1 and 2 finished successfully."
+    echo "=============================="
     ;;
 
-  stage3)
-    restore_stage_files
+  stage3+4)
+    # Restore Stage 1/2 outputs from the persistent server copy.
+    # Stage 4 then directly uses the Stage 3 output generated
+    # in this same GitHub Actions workspace.
+    restore_stage3_prerequisites
     run_stage3
-    ;;
-
-  stage4)
-    restore_stage_files
     run_stage4
+
+    echo "=============================="
+    echo "Stages 3 and 4 finished successfully."
+    echo "=============================="
     ;;
 
   full-stage)
-    # No restore is needed because all stages run sequentially
-    # in the same GitHub Actions workspace.
+    # All stages run sequentially in the same workspace.
+    # No prerequisite restoration is needed.
     run_stage1
     run_stage2
     run_stage3
@@ -301,4 +273,3 @@ case "${OPTION}" in
     echo "=============================="
     ;;
 esac
-
