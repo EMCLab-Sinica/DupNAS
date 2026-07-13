@@ -1,16 +1,5 @@
-```bash
 #!/usr/bin/env bash
 set -euo pipefail
-
-# =========================
-# Run option
-# =========================
-# Usage:
-#   ./run.sh stage1
-#   ./run.sh stage2
-#   ./run.sh stage3
-#   ./run.sh stage4
-#   ./run.sh full
 
 OPTION="${1:-${OPTION:-}}"
 
@@ -25,7 +14,6 @@ case "${OPTION}" in
 esac
 
 echo "Selected option: ${OPTION}"
-
 # =========================
 # User configuration
 # =========================
@@ -164,4 +152,4 @@ case "${OPTION}" in
     echo "=============================="
     ;;
 esac
-```
+
