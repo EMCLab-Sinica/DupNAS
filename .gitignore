@@ -28,3 +28,4 @@ DupNAS/HEtest/outputs/
 
 DupNAS/genonnx/old_onnx/
 Inference/Model-converter/ts_old_code/
+.zip
