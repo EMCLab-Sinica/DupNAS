@@ -68,7 +68,13 @@ run_stage2() {
   echo "Starting Stage 2"
   echo "=============================="
 
-  python3.9 -m NASBase.run_nas \
+  python3.9 -m torch.distributed.run \
+    --nnodes=1 \
+    --nproc_per_node=4 \
+    --max_restarts=0 \
+    --rdzv_backend=c10d \
+    --rdzv_endpoint=localhost:29601 \
+    -m NASBase.run_nas \
     --stages 2 \
     --arc "${ARC}" \
     --dataset IMAGE100 \
@@ -76,7 +82,20 @@ run_stage2() {
     --vmsize "${VMSIZE}" \
     --suffix "${SUFFIX}" \
     --no-rlogger \
+    --dist ddp \
+    --amp fp16 \
     2>&1 | tee "${LOG_PREFIX}-s2.txt"
+
+  # # single gpu 
+  # python3.9 -m NASBase.run_nas \
+  #   --stages 2 \
+  #   --arc "${ARC}" \
+  #   --dataset IMAGE100 \
+  #   --mode "${MODE}" \
+  #   --vmsize "${VMSIZE}" \
+  #   --suffix "${SUFFIX}" \
+  #   --no-rlogger \
+  #   2>&1 | tee "${LOG_PREFIX}-s2.txt"
 
   echo "Stage 2 finished successfully."
 }
@@ -109,7 +128,7 @@ run_stage4() {
     --nproc_per_node=4 \
     --max_restarts=0 \
     --rdzv_backend=c10d \
-    --rdzv_endpoint=localhost:29601 \
+    --rdzv_endpoint=localhost:29611 \
     -m NASBase.run_nas \
     --stages 4 \
     --arc "${ARC}" \
