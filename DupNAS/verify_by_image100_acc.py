@@ -477,7 +477,7 @@ def main():
                 print(
                     f"[RESULT] {onnx_path.name}: "
                     f"Top-1={result['top1_acc']:.2f}%, "
-                    f"Top-5={result['top5_acc']:.2f}%"
+                    # f"Top-5={result['top5_acc']:.2f}%"
                 )
                 print()
 
@@ -487,19 +487,19 @@ def main():
                     {
                         "model": onnx_path.name,
                         "top1_accuracy": "ERROR",
-                        "top5_accuracy": "ERROR",
+                        # "top5_accuracy": "ERROR",
                     }
                 )
                 f.flush()
 
     if summary_rows:
         print("Accuracy summary:")
-        print(f"{'model':<60} {'Top-1 accuracy':>15} {'Top-5 accuracy':>15}")
+        print(f"{'model':<60} {'Top-1 accuracy':>15}" ) # {'Top-5 accuracy':>15}")
         for row in summary_rows:
             print(
                 f"{row['model_name']:<60} "
                 f"{row['top1_acc']:>14.2f}% "
-                f"{row['top5_acc']:>14.2f}%"
+                # f"{row['top5_acc']:>14.2f}%"
             )
 
     print(f"[DONE] Saved accuracy results to: {args.output}")

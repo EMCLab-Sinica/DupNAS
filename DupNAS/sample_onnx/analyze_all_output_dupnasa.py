@@ -203,14 +203,14 @@ def print_summary_rows(rows: List[dict]) -> None:
         print(f"  original_feasible_ratio: {r['original_feasible_ratio']}")
         print(f"  dupnas_feasible: {r['dupnas_feasible']}")
         print(f"  dupnas_feasible_ratio: {r['dupnas_feasible_ratio']}")
-        print(f"  reduction_1/4_count: {r['reduction_1/4_count']}")
-        print(f"  reduction_1/4_ratio_in_dupnasa_feasible: {r['reduction_1/4_ratio_in_dupnasa_feasible']}")
-        print(f"  reduction_2/4_count: {r['reduction_2/4_count']}")
-        print(f"  reduction_2/4_ratio_in_dupnasa_feasible: {r['reduction_2/4_ratio_in_dupnasa_feasible']}")
-        print(f"  reduction_3/4_count: {r['reduction_3/4_count']}")
-        print(f"  reduction_3/4_ratio_in_dupnasa_feasible: {r['reduction_3/4_ratio_in_dupnasa_feasible']}")
-        print(f"  reduction_4/4_count: {r['reduction_4/4_count']}")
-        print(f"  reduction_4/4_ratio_in_dupnasa_feasible: {r['reduction_4/4_ratio_in_dupnasa_feasible']}")
+        # print(f"  reduction_1/4_count: {r['reduction_1/4_count']}")
+        # print(f"  reduction_1/4_ratio_in_dupnasa_feasible: {r['reduction_1/4_ratio_in_dupnasa_feasible']}")
+        # print(f"  reduction_2/4_count: {r['reduction_2/4_count']}")
+        # print(f"  reduction_2/4_ratio_in_dupnasa_feasible: {r['reduction_2/4_ratio_in_dupnasa_feasible']}")
+        # print(f"  reduction_3/4_count: {r['reduction_3/4_count']}")
+        # print(f"  reduction_3/4_ratio_in_dupnasa_feasible: {r['reduction_3/4_ratio_in_dupnasa_feasible']}")
+        # print(f"  reduction_4/4_count: {r['reduction_4/4_count']}")
+        # print(f"  reduction_4/4_ratio_in_dupnasa_feasible: {r['reduction_4/4_ratio_in_dupnasa_feasible']}")
 
 def write_csv(path: Path, rows: List[dict]) -> None:
     if not rows:
