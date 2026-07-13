@@ -21,7 +21,7 @@ def summary(name, values):
         f"q1={percentile(values, 0.25):.3f} "
         f"median={percentile(values, 0.5):.3f} "
         f"q3={percentile(values, 0.75):.3f} "
-        f"max={values[-1]:.3f}"
+        f"max={values[-1]:.3f} "
         f"avg={avg:.3f} "
     )
 
