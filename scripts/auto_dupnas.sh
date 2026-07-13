@@ -58,7 +58,7 @@ run_stage1() {
     --vmsize "${VMSIZE}" \
     --suffix "${SUFFIX}" \
     --no-rlogger \
-    > "${LOG_PREFIX}-s1.txt" 2>&1
+    2>&1 | tee "${LOG_PREFIX}-s1.txt"
 
   echo "Stage 1 finished successfully."
 }
@@ -76,7 +76,7 @@ run_stage2() {
     --vmsize "${VMSIZE}" \
     --suffix "${SUFFIX}" \
     --no-rlogger \
-    > "${LOG_PREFIX}-s2.txt" 2>&1
+    2>&1 | tee "${LOG_PREFIX}-s2.txt"
 
   echo "Stage 2 finished successfully."
 }
@@ -94,7 +94,7 @@ run_stage3() {
     --vmsize "${VMSIZE}" \
     --suffix "${SUFFIX}" \
     --no-rlogger \
-    > "${LOG_PREFIX}-s3.txt" 2>&1
+    2>&1 | tee "${LOG_PREFIX}-s3.txt"
 
   echo "Stage 3 finished successfully."
 }
@@ -120,7 +120,7 @@ run_stage4() {
     --no-rlogger \
     --dist ddp \
     --amp fp16 \
-    > "${LOG_PREFIX}-s4.txt" 2>&1
+    2>&1 | tee "${LOG_PREFIX}-s4.txt"
 
   echo "Stage 4 finished successfully."
 }
