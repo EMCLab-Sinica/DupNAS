@@ -5,13 +5,13 @@ __pycache__
 
 data/
 datasets/
-checkpoints/
-outputs/
-results/
-genonnx/
+#checkpoints/
+#outputs/
+#results/
+#genonnx/
 
-*.onnx
-*.pth
-*.pt
+# *.onnx
+# *.pth
+# *.pt
 *.tar
 *.zip
