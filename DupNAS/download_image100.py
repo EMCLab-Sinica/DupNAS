@@ -35,13 +35,21 @@ def main() -> int:
     print(f"Target directory: {dataset_dir}")
     print("=" * 60)
 
-    try:
-        train_dir, val_dir = load_image100_dataset(
-            DATASET_DIR=dataset_dir
-        )
-    except Exception as error:
-        print(f"\nERROR: Failed to prepare ImageNet-100: {error}")
-        return 1
+    if not os.path.exists(dataset_dir):
+        print(f"Dataset directory does not exist: {dataset_dir}")
+        print("Downloading and preparing ImageNet-100...")
+
+        try:
+            train_dir, val_dir = load_image100_dataset(
+                DATASET_DIR=dataset_dir
+            )
+        except Exception as error:
+            print(f"\nERROR: Failed to prepare ImageNet-100: {error}")
+            return 1
+    else:
+        print("ImageNet-100 dataset already exists. Skip download.")
+        train_dir = os.path.join(dataset_dir, "train")
+        val_dir = os.path.join(dataset_dir, "val")
 
     if not os.path.isdir(train_dir):
         print(f"ERROR: Training directory does not exist: {train_dir}")
