@@ -77,9 +77,12 @@ jobs:
         run: bash scripts/fig8/fig8.sh
       - name: Show experiment results
         run: |
-          echo "================ Fig. 8 Results: STM32F746 Deployment ================"
-          column -s, -t < results/tflm_f7/results.csv
-          echo "========================================================================"
+          echo "============= Fig. 8 Results: STM32F746 Deployment ============="
+          {
+            echo "model_name,latency (s),accuracy (%)"
+            tail -n +2 results/tflm_f7/results.csv
+          } | column -s, -t
+          echo "=================================================================="
       - name: Upload results
         uses: actions/upload-artifact@v7
         with:
