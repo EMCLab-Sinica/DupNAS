@@ -98,7 +98,6 @@ class Stages(IntEnum):
 class SSOptPolicy(str, Enum):
     FLOPS = 'FLOPS'
 
-
 SETTINGS_CATEGORIES = (
     'GLOBAL_SETTINGS',
     'CUDA_SETTINGS',
@@ -179,8 +178,8 @@ class Settings(object): ##default settintgs & discription
         'TRAIN_PRINT_FREQ' : 100,   # print frequency of training      
 
         #NEW  "shuffle", "incept", "mbv2"  #no use: "mobile",
-        'ARC': 'shuffle',
-        'MODE': 'nots', # "dupnas", "tinyts", "patchts", "nots"
+        'ARC': 'mbv2',
+        'MODE': 'dupnas', # "dupnas", "tinyts", "patchts", "nots"
         'GOAL': 'bal',  #bal, mem
         'VMSIZE': 128,
         'EXP_FILE': False,
@@ -191,8 +190,8 @@ class Settings(object): ##default settintgs & discription
     
     # Search space optimization default settings    
     NAS_SSOPTIMIZER_SETTINGS = {
-        'SUBNET_SAMPLE_SIZE' : 3,    
-        'VALID_SUBNETS_THRESHOLD': 0.25, # 0.05 or some other ratios
+        'SUBNET_SAMPLE_SIZE' : 200,    
+        'VALID_SUBNETS_THRESHOLD': 0.10, # 0.05 or some other ratios
         'DO_RESAMPLING': False,
         'SSOPT_POLICY' : SSOptPolicy.FLOPS,
         # specify which constraints to consider
@@ -230,11 +229,10 @@ class Settings(object): ##default settintgs & discription
         'ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/NASBase/onnx_model/",
         'GEN_ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/genonnx/"+ NAS_SETTINGS_GENERAL['ARC']+'/',
 
-
         # 'LATENCY_RATIO' : 2,
-        # 'LATENCY_PROXY' : 98418272,
-
-             
+        # 'LATENCY_PROXY' : 532837563 ,
+        
+    
     }
 
 
@@ -295,6 +293,7 @@ class Settings(object): ##default settintgs & discription
             'DROPPING_ENABLED': False,
         }
 
+   
     elif arc == 'mbv2':
         DupNAS['STAGE1_SETTINGS'] = {
             'DROPPING_BLOCK_LEVEL': {
@@ -350,7 +349,7 @@ class Settings(object): ##default settintgs & discription
 
     # Base settings for IMAGE100
     image100_base = {
-        'NUM_BLOCKS': 3,
+        'NUM_BLOCKS': 4,
         'NUM_CLASSES': 100,
         'STEM_C_OUT': 16,
         'INPUT_CHANNELS': 3,
@@ -365,10 +364,10 @@ class Settings(object): ##default settintgs & discription
         'TRAIN_SUPERNET_BATCHSIZE': 128,
         'TRAIN_SUBNET_BATCHSIZE': 128,
         'VAL_BATCHSIZE': 128,
-        'TRAIN_SUPERNET_EPOCHS': 1000,
+        'TRAIN_SUPERNET_EPOCHS': 200,
         'TRAIN_SUBNET_EPOCHS': 25,
-        'FINETUNE_SUBNET_EPOCHS': 100,
-        'FINETUNE_BATCHSIZE': 200,
+        'FINETUNE_SUBNET_EPOCHS': 200,
+        'FINETUNE_BATCHSIZE': 64,
         'FINETUNE_OPT_LR': 0.2,
     }
 
@@ -536,7 +535,7 @@ def arg_parser(test_settings):
     parser.add_argument('--gpuid',    type=str, default=argparse.SUPPRESS,  help="GPU selection")
     
     parser.add_argument('--dataset',  type=str,  default=argparse.SUPPRESS,  help="supported dataset including : 1. CIFAR10 (default), 2. IMAGE100")
-    
+
     parser.add_argument('--seed',    type=int, default=argparse.SUPPRESS,   help="seed for randomness, default is 123")
     parser.add_argument('--suffix',   type=str, default=argparse.SUPPRESS,   help="experiment run name suffix")
     parser.add_argument('--settings', type=str, default=argparse.SUPPRESS, help="settings files to load")
@@ -550,12 +549,12 @@ def arg_parser(test_settings):
     parser.add_argument('--rlogger-proj-name', type=str, default=argparse.SUPPRESS, help='Project name for the remote logger')
 
     #----new for TS
-    parser.add_argument("--arc", type=str, default="mobile", choices=["mobile", "shuffle", "incept", "mbv2"], 
+    parser.add_argument("--arc", type=str, default="mobile", choices=["mobile", "shuffle", "incept", "mbv2"],  
                     help="Choose one of: mobile, shuffle, incept")
     parser.add_argument("--mode", type=str, default="dupnas", choices=["dupnas", "tinyts", "patchts", "nots"],
                     help="Choose one of: dupnas, tinyts, patchts, nots")
-    parser.add_argument("--priority", type=str, default="bal", choices=["bal", "mem"],  #none: no any TS
-                    help="Choose one of: bal, mem (goal)")
+    parser.add_argument("--priority", type=str, default="bal", choices=["bal", "mem"],  
+                    help="Choose one of: pdq, bal, mem (goal)")
     parser.add_argument("--export_file", action='store_true',
                     help="Enable exporting reports and figures")
     parser.add_argument("--vmsize", type=int, default=128,
@@ -612,7 +611,7 @@ def arg_parser(test_settings):
         print('ARG_SET_SUFFIX : ', args.suffix)
         test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] = args.suffix
 
-
+   
     if 'stages' in args:
         print('ARG_STAGES : ', args.stages)
         test_settings.NAS_SETTINGS_GENERAL['STAGES'] = args.stages
@@ -637,8 +636,6 @@ def arg_parser(test_settings):
     test_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_RESULTS_FNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + '_ssoptlog.json'
     test_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_TRAINED_SUPERNET_FNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + '_trsupnetresults.json'
     test_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_LOGFNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + "_evosearchlog.json"
-
-
 
     print(str(test_settings))
 

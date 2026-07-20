@@ -8,4 +8,24 @@ README-old.md
 __pycache__/
 *.pyc
 *.bat
-*.xlsx
+# *.xlsx
+DupNAS/sample_onnx/shufflenet/*.onnx
+DupNAS/sample_onnx/mobilenet/*.onnx
+DupNAS/sample_onnx/inception/*.onnx
+
+*.onnx.filepart
+*_inferred.onnx
+DupNAS/NASBase/dataset/
+DupNAS/sample_onnx/outputs/shufflenet/
+DupNAS/sample_onnx/outputs/mobilenet/
+DupNAS/sample_onnx/outputs/inception/
+
+DupNAS/TStime/shufflenet/
+DupNAS/TStime/mobilenet/
+DupNAS/TStime/inception/
+
+DupNAS/HEtest/outputs/
+
+DupNAS/genonnx/old_onnx/
+Inference/Model-converter/ts_old_code/
+.zip

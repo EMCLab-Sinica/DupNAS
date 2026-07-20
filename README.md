@@ -45,7 +45,7 @@ Below is a brief description of the main directories and files in this repositor
 - Install the required Python packages listed in `requirements.txt` with:
   `python3.9 -m pip install -r requirements.txt`
 - [Anaconda](https://www.anaconda.com/docs/getting-started/anaconda/install/overview) (recommended for managing Python environments).
-- [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data) dataset. Load the dataset using: `/DupNAS/NASBase/load_image100.py`.
+- [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data) dataset. 
 - [STM32F746NG MCU](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) deployment device.
 - [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) development tools for the STM32.
 - [TensorFlow Lite Micro](https://github.com/tensorflow/tflite-micro) inference engine.
@@ -54,43 +54,78 @@ Below is a brief description of the main directories and files in this repositor
 
 1. Download or clone this repository.
 2. Create and activate a Python environment, then install the required dependencies.
-3. Prepare the ImageNet-100 dataset and update the dataset paths.
-4. Invoke DupNAS as follows:
-  ```python
-  python3.9 -m NASBase.run_nas --stages <stage> --arc <arc> --dataset IMAGE100 --mode <mode> --vmsize <vmsize> --suffix <suffix> --no-rlogger
-  ```
+   ```python
+   python3.9 -m pip install -r requirements.txt
+   ```
+3. Configure access to the ImageNet-100 dataset
+   * Open the [ImageNet-100 Kaggle page](https://www.kaggle.com/datasets/ambityga/imagenet100).
+   * Generate a Kaggle API token.
+   * Export the token:
+     ```bash
+     export KAGGLE_API_TOKEN="<your-token>"
+     ```
+   * Store the token in the Kaggle configuration directory:
+     ```bash
+     mkdir -p ~/.kaggle
+     echo "<your-token>" > ~/.kaggle/access_token
+     chmod 600 ~/.kaggle/access_token
+     ```
+   The dataset is downloaded and prepared automatically when DupNAS is run for the first time stage 2.
+4. Copy the configuration file for the target architecture and run DupNAS:
+   ```bash
+   cd DupNAS/
+   cp settings/settings-<arc>.py settings.py
+
+   python3.9 -m NASBase.run_nas \
+     --stages <stage> \
+     --arc <arc> \
+     --dataset IMAGE100 \
+     --mode <mode> \
+     --vmsize <vmsize> \
+     --suffix <suffix> \
+     --no-rlogger
+   ```
   
   📝 Arguments
-  | Option | Description | Candidate Values |
+  | Options | Description | Candidate Values |
   |---|---|---|
   | `--stages` | Number of NAS stages: ssopt, training, evosearch, fine-tuning | `1`, `2`, `3`, `4` |
   | `--arc` | network architecture family | `mbv2`, `shuffle`, `incept` |
   | `--dataset` | Dataset used for search | `IMAGE100` |
   | `--mode` | splitting strategy  | `dupnas`, `tinyts`, `patchts`, `nots` | 
   | `--vmsize` | VM constraint in KB | `96`, `128`, `256` |
-  | `--suffix` | Experiment suffix for naming outputs | user-defined string |
+  | `--suffix` | Experiment suffix for naming outputs. Use the same suffix for all four stages. | user-defined string |
   
-5. Extract the network solution from `best_solution,json` and use it to fill in `spec_model.txt`
-6. Generate the ONNX models for the selected solution using 
-  `python3.9 -m NASBase.spec_onnx_gen --arc <arc>`. The outputs will be saved in `/DupNAS/genonnx/`.
-7. Go to `/DupNAS/genonnx/`, then run `python3.9 -m DupNAS_SA.py --onnx <onnx_name> --mode <mode> --vmsize <vmsize> --export_file` to generate the TS configuration. Alternatively, you can run `run_all_onnx.sh` to automatically generate TS configurations for all ONNX models in the directory.
-8. Run `gen_ts_cfg.py` to collect the `split-configuration JSON file` for the model converter
+5. After completing Stages 1–4, extract the selected network configuration, the final solution is saved in `/DupNAS/NASBase/train_log/<suffix>_best_solution.json`
+6. ONNX generation and tensor-splitting conversion are integrated into the model-converter workflow. Continue with steps in the next section.
 
 
 ### ✂️ Setup and running the model converter
-
-1. Copy the ONNX model and its corresponding split-configuration JSON file from `/DupNAS/genonnx/` to `/Inference/Model-converter/`
-2. Split the model by following [ONNX Tensor Splitter](Inference/Model-converter/README.md).
-3. Convert the ONNX models to TFLite with [onnx2tf](https://github.com/PINTO0309/onnx2tf). We recommend using the official Docker image:
+1. Copy the configurations `"supernet config"` and `"subnet_choice_per_blk"` from: `<suffix>_best_solution.json`, into: `/DupNAS/NASBase/spec_model_<arc>.txt`.
+2. Go to `/DupNAS/`, then run the corresponding script to generate the selected ONNX models: 
    ```bash
-   run --rm -it -v $(pwd):/workdir -w /workdir ghcr.io/pinto0309/onnx2tf:1.28.5  
-   onnx2tf -i ONNX_MODEL -oiqt
+   bash gen_selected_shuffle.sh
+   bash gen_selected_mbv2.sh
+   bash gen_selected_incept.sh
    ```
-   This produces the integer-quantized TFLite-Micro models (e.g., `xxx_full_integer_quant.tflite`).
-
+3. The generated models are saved in the following locations:
+   * Original selected ONNX models: `/DupNAS/genonnx/<arc>/`
+   * Tensor-split ONNX models: `/Inference/Model-converter/ts_converted/<arc>/`
+4. Go to the `/Inference/onnx-to-tflite/` directory and run the corresponding conversion command:
+   ```bash
+   bash convert.sh shuffle
+   bash convert.sh mbv2
+   bash convert.sh incept
+   ```
+   The conversion uses [onnx2tf](https://github.com/PINTO0309/onnx2tf) to generate integer-quantized TensorFlow Lite models, such as:
+   ```text
+   xxx_full_integer_quant.tflite
+   ```
+   The generated TFLite models are saved under `/Inference/onnx-to-tflite/outputs/`
+   
 ### ⚙️ Setup and building TFLite-Micro
 
-1. Copy the converted TFLite-Micro model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
+1. Copy the converted TFLite model (`xxx_full_integer_quant.tflite`) into `Tflm-engine/src/models`.
 2. Follow [Tflm-engine/README.md](Inference/Tflm-engine/README.md) to build the TFLite-Micro static library (`libtensorflow-microlite.a`).
 3. Add the generated static library to your STM32CubeIDE project settings. Then include `Tflm-engine/src/tflm_main.h` and call `tflm_main_xxx` to run inference for the target model.
 

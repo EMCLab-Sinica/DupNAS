@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import onnx_graphsurgeon as gs
 
-SUPPORTED_GROUP_OPS = {"Conv", "Relu", "Add", "Concat", "AveragePool", "Reshape"}
+SUPPORTED_GROUP_OPS = {"Conv", "Relu", "Add", "Concat", "AveragePool", "Reshape", "Pad"}
 
 _InputSource = namedtuple(
     "_InputSource",
@@ -22,8 +22,11 @@ _GroupInfo = namedtuple(
         "execution_order",
         "nodes",
         "entry_tensor",
-        "exit_tensor",
+        "sink_local_indices",
         "node_specs",
+        # Nodes whose full output tensor is needed outside the split group.
+        # For tinyts/patchts this may include multiple internal sinks.
+        "external_output_local_indices",
     ],
 )
 
@@ -55,7 +58,8 @@ def _reachable_indices(seed_indices, edges):
     return visited
 
 
-def _validate_group_topology(node_specs, in_edges, out_edges):
+def _validate_group_topology_strict(node_specs, in_edges, out_edges):
+    """Original topology rule used by DupNAS."""
     source_local_indices = [index for index, incoming in enumerate(in_edges) if not incoming]
     assert source_local_indices, "group must have at least one source node"
 
@@ -75,10 +79,37 @@ def _validate_group_topology(node_specs, in_edges, out_edges):
         assert spec.local_index in reachable_from_sources, f"node {spec.node.name} is not reachable from any group source node"
         assert spec.local_index in reachable_to_sink, f"node {spec.node.name} does not feed the group sink node"
 
-    return sink_local_index
+    return [sink_local_index]
 
 
-def _validate_non_sink_outputs(group_nodes, sink_local_index, graph_outputs):
+def _validate_group_topology_multisink(node_specs, in_edges, out_edges):
+    """Relaxed topology rule for TinyTS/PatchTS.
+
+    These methods may select a range that contains several branch paths but
+    stops before the branch merge. In that case the group has multiple internal
+    sinks. Each sink is reconstructed back to a full tensor and fed to the
+    original outside consumer, so the original merge node can stay outside the
+    split group.
+    """
+    source_local_indices = [index for index, incoming in enumerate(in_edges) if not incoming]
+    assert source_local_indices, "group must have at least one source node"
+
+    sink_local_indices = [index for index, outgoing in enumerate(out_edges) if not outgoing]
+    assert sink_local_indices, "group must have at least one sink node"
+
+    reachable_from_sources = _reachable_indices(source_local_indices, out_edges)
+    reachable_to_any_sink = _reachable_indices(sink_local_indices, in_edges)
+    for spec in node_specs:
+        assert spec.local_index in reachable_from_sources, f"node {spec.node.name} is not reachable from any group source node"
+        assert spec.local_index in reachable_to_any_sink, f"node {spec.node.name} does not feed any group sink node"
+
+    return sink_local_indices
+
+
+def _validate_non_sink_outputs_strict(group_nodes, sink_local_indices, graph_outputs):
+    """Original external-output check used by DupNAS."""
+    assert len(sink_local_indices) == 1
+    sink_local_index = sink_local_indices[0]
     group_node_ids = {id(node) for node in group_nodes}
     graph_output_ids = {id(tensor) for tensor in graph_outputs}
 
@@ -101,7 +132,26 @@ def _validate_non_sink_outputs(group_nodes, sink_local_index, graph_outputs):
         )
 
 
-def _collect_node_specs(group_nodes, graph_outputs):
+def _collect_external_output_local_indices(group_nodes, graph_outputs):
+    """Return local indices whose full outputs are needed outside the group."""
+    group_node_ids = {id(node) for node in group_nodes}
+    graph_output_ids = {id(tensor) for tensor in graph_outputs}
+    external_output_local_indices = []
+
+    for local_index, node in enumerate(group_nodes):
+        output_tensor = node.outputs[0]
+        external_consumers = [
+            consumer for consumer in output_tensor.outputs if id(consumer) not in group_node_ids
+        ]
+        feeds_graph_output = id(output_tensor) in graph_output_ids
+
+        if external_consumers or feeds_graph_output:
+            external_output_local_indices.append(local_index)
+
+    return external_output_local_indices
+
+
+def _collect_node_specs(group_nodes, graph_outputs, allow_external_non_sink_outputs=False):
     local_index_by_id = {id(node): local_index for local_index, node in enumerate(group_nodes)}
 
     entry_tensor = None
@@ -128,44 +178,48 @@ def _collect_node_specs(group_nodes, graph_outputs):
                     entry_tensor = tensor
                 else:
                     assert tensor is entry_tensor, "group source nodes must all read the same external entry tensor"
-                input_sources[input_index] = _InputSource(
-                    kind="entry",
-                    producer_local_index=None,
-                )
+                input_sources[input_index] = _InputSource(kind="entry", producer_local_index=None)
             else:
-                input_sources[input_index] = _InputSource(
-                    kind="node",
-                    producer_local_index=producer_local_index,
-                )
+                input_sources[input_index] = _InputSource(kind="node", producer_local_index=producer_local_index)
                 internal_edges.append((producer_local_index, local_index))
 
         assert input_sources, f"node {node.name} must have at least one input"
         assert len(node.outputs) == 1, f"node {node.name} must have exactly one output"
 
-        node_specs.append(
-            _NodeSpec(
-                node=node,
-                local_index=local_index,
-                input_sources=input_sources,
-            )
-        )
+        node_specs.append(_NodeSpec(node=node, local_index=local_index, input_sources=input_sources))
 
     assert entry_tensor is not None, "group must have exactly one external entry tensor"
 
     in_edges, out_edges = _build_adjacency(len(group_nodes), internal_edges)
-    sink_local_index = _validate_group_topology(node_specs, in_edges, out_edges)
-    _validate_non_sink_outputs(group_nodes, sink_local_index, graph_outputs)
+    if allow_external_non_sink_outputs:
+        sink_local_indices = _validate_group_topology_multisink(node_specs, in_edges, out_edges)
+        external_output_local_indices = _collect_external_output_local_indices(group_nodes, graph_outputs)
+    else:
+        sink_local_indices = _validate_group_topology_strict(node_specs, in_edges, out_edges)
+        _validate_non_sink_outputs_strict(group_nodes, sink_local_indices, graph_outputs)
+        external_output_local_indices = _collect_external_output_local_indices(group_nodes, graph_outputs)
 
-    return entry_tensor, node_specs
+    assert external_output_local_indices, (
+        "split group has no external outputs to reconnect; this is probably an invalid/dead group"
+    )
+
+    return entry_tensor, sink_local_indices, node_specs, external_output_local_indices
 
 
-def _analyze_group(orig_nodes, group_cfg, graph_outputs):
+def _analyze_group(orig_nodes, group_cfg, graph_outputs, allow_external_non_sink_outputs=False):
     start, end = group_cfg.node_range
     assert 0 <= start <= end < len(orig_nodes), f"invalid node_range {group_cfg.node_range}"
 
     group_nodes = orig_nodes[start : end + 1]
-    entry_tensor, node_specs = _collect_node_specs(group_nodes, graph_outputs)
-    exit_tensor = group_nodes[-1].outputs[0]
+    entry_tensor, sink_local_indices, node_specs, external_output_local_indices = _collect_node_specs(
+        group_nodes,
+        graph_outputs,
+        allow_external_non_sink_outputs=allow_external_non_sink_outputs,
+    )
+
+    if len(sink_local_indices) > 1:
+        sink_names = [group_nodes[i].name for i in sink_local_indices]
+        print(f"[TS] multi-sink group {start}~{end}: sinks={sink_local_indices} names={sink_names}")
 
     return _GroupInfo(
         node_range=group_cfg.node_range,
@@ -173,6 +227,7 @@ def _analyze_group(orig_nodes, group_cfg, graph_outputs):
         execution_order=group_cfg.execution_order,
         nodes=group_nodes,
         entry_tensor=entry_tensor,
-        exit_tensor=exit_tensor,
+        sink_local_indices=sink_local_indices,
         node_specs=node_specs,
+        external_output_local_indices=external_output_local_indices,
     )

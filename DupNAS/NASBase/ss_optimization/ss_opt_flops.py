@@ -72,7 +72,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
     for i, each_subnet_config in enumerate(subnet_config_list):        
         
         each_subnet = MNASSubNet(**each_subnet_config)
-        print("i: ", i)
+        #print("i: ", i)
         under_mem = False
         flops_sum = 0
         mac_count = 0
@@ -96,7 +96,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
             
             if USE_TS:
                 vm_available = global_settings.NAS_SETTINGS_GENERAL['VMSIZE']
-                print("Convert pth to onnx:")
+                #print("Convert pth to onnx:")
                 each_subnet.eval()
 
                 onnx_path = global_settings.NAS_EVOSEARCH_SETTINGS['ONNX_FILE_PATH']
@@ -186,7 +186,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                         per_result['TS'] = False 
                     
                     if not under_mem:
-                        print("can not find valid duplication for all peak nodes")
+                        #print("can not find valid duplication for all peak nodes")
                         per_result['under'] = False
                         check_per_results.append(per_result.copy())
                         continue
@@ -194,7 +194,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                     if USE_LATENCY_PROXY:
                         total_latency = (ori_mac + plus_mac)+ LC_RATIO * (ori_access + plus_access)
                         if total_latency > LC_PROXY:
-                            print("Over latency constraint")
+                            #print("Over latency constraint")
                             under_mem = False
                             per_result['under'] = False
                             check_per_results.append(per_result.copy())
@@ -212,7 +212,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                     per_result['mem'] = peak_for_all
                     
                     if peak_for_all > (vm_available*1024):
-                        print("after TS, still over vm")
+                        #print("after TS, still over vm")
                         under_mem = False
                         per_result['under'] = False
                         check_per_results.append(per_result.copy())
@@ -257,14 +257,14 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                     if USE_LATENCY_PROXY:
                         total_latency = (ori_mac + plus_mac)+ LC_RATIO * (ori_access + plus_access)
                         if total_latency > LC_PROXY:
-                            print("Over latency constraint")
+                            #print("Over latency constraint")
                             under_mem = False
                             per_result['under'] = False
                             check_per_results.append(per_result.copy())
                             continue
 
                     if peak_after_sp > (vm_available*1024):
-                        print("after tinyts, can not meet vm constraint")
+                        #print("after tinyts, can not meet vm constraint")
                         under_mem = False
                         per_result['under'] = False
                         check_per_results.append(per_result.copy())
@@ -295,7 +295,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
 
 
                     if min_latency_result:
-                        print("find min_latency_result")
+                        #print("find min_latency_result")
                         peak_after_patch = min_latency_result['total_peak_mem']
                         per_result['ori_mac'] = min_latency_result['mac_ori']+min_latency_result['mac_other']
                         per_result['plus_mac'] = min_latency_result['mac_gap']
@@ -307,7 +307,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                         per_result['mem'] = peak_after_patch
 
                     elif min_mem_result:
-                        print("find min_mem_result")
+                        #print("find min_mem_result")
                         peak_after_patch = min_mem_result['total_peak_mem']
                         per_result['ori_mac'] = min_mem_result['mac_ori']+min_mem_result['mac_other']
                         per_result['plus_mac'] = min_mem_result['mac_gap']
@@ -319,7 +319,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                         per_result['mem'] = peak_after_patch
 
                     elif tried_but_not_valid:
-                        print("didn't find valid patching")
+                        #print("didn't find valid patching")
                         peak_after_patch = tried_but_not_valid['total_peak_mem']
                         per_result['ori_mac'] = tried_but_not_valid['mac_ori']+tried_but_not_valid['mac_other']
                         per_result['plus_mac'] = tried_but_not_valid['mac_gap']
@@ -337,7 +337,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                     if USE_LATENCY_PROXY and (total_latency==0):
                         total_latency = (per_result['ori_mac'] + per_result['plus_mac']) + LC_RATIO * (per_result['ori_access'] + per_result['plus_access'])
                         if total_latency > LC_PROXY:
-                            print("Over latency constraint")
+                            #print("Over latency constraint")
                             under_mem = False
                             per_result['under'] = False
                             check_per_results.append(per_result.copy())
@@ -345,7 +345,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
 
                     
                     if peak_after_patch >= (vm_available*1024):
-                        print("after patchts, can not meet vm constraint")
+                        #print("after patchts, can not meet vm constraint")
                         under_mem = False
                         per_result['under'] = False
                         check_per_results.append(per_result.copy())
@@ -366,7 +366,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                     per_result['ori_access'] = total_access
                     per_result['plus_access'] = 0
                     per_result['mem'] = oripeak
-                    print(f"which_over_mem: {which_over_mem}")
+                    #print(f"which_over_mem: {which_over_mem}")
                     per_result['TS'] = False 
 
                     if which_over_mem == [] and oripeak <= (vm_available*1024):
@@ -397,7 +397,8 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
 
             subnet_latency_info = performance_model.get_latency_info(subnet_obj, subnet_cpb)
             if subnet_latency_info:
-                   print("subnet_latency_info = ", subnet_latency_info['perf_e2e_contpow_fp_lat'])
+                idle=0
+                #print("subnet_latency_info = ", subnet_latency_info['perf_e2e_contpow_fp_lat'])
             else:
                 per_result['under'] = False
                 check_per_results.append(per_result.copy())
@@ -435,7 +436,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
                 flops_sum = (per_result['ori_mac']+per_result['plus_mac']) *2
 
             if per_result['TS'] and not network_flops_contpow: # and constraint_stats['flops_max'] == float('-inf'):
-                print("use mac_count")
+                #print("use mac_count")
                 flops_sum =(per_result['ori_mac']+per_result['plus_mac']) *2
                 constraint_stats['flops_max'] = max(flops_sum,constraint_stats['flops_max'])
                 constraint_stats['flops_min'] = max(flops_sum,constraint_stats['flops_max'])
@@ -461,7 +462,9 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
         
           
         if (error_net_perf == False):
-            print("[CPU-{}] Finished processing subnet: {}, flops: under CONTpow={}".format(cpuid, subnet_name, network_flops_contpow))
+            #print("[CPU-{}] Finished processing subnet: {}, flops: under CONTpow={}".format(cpuid, subnet_name, network_flops_contpow))
+            print("[CPU-{}] Finished processing subnet: {}".format(cpuid, subnet_name))
+        
         else:
             print("[CPU-{}] ERROR processing subnet: {}, flops: under CONTpow={}".format(cpuid, subnet_name, network_flops_contpow))
         
@@ -483,7 +486,7 @@ def flops_worker(cpuid, global_settings: Settings, width_multiplier, input_resol
 
 
         check_per_results.append(per_result.copy())
-        print(f"[SUBCHECK]subnet: {per_result['id']}, oripeak:{per_result['oripeak']} , peak memory: {per_result['mem']}, flops: {per_result['flops']}, nvm: {per_result['nvm']}, under_const: {per_result['under']}, under_nvm: {per_result['under_nvm']}, ori_mac: {per_result['ori_mac']}, plus_mac: {per_result['plus_mac']}, ori_access: {per_result['ori_access']},plus_access: {per_result['plus_access']}, cpb: {per_result['cpb']}, TS: {per_result['TS']}\n")
+        print(f"[CPU-{cpuid}][SUBCHECK]subnet: {per_result['id']}, oripeak:{per_result['oripeak']} , peak memory: {per_result['mem']}, flops: {per_result['flops']}, nvm: {per_result['nvm']}, under_const: {per_result['under']}, under_nvm: {per_result['under_nvm']}, ori_mac: {per_result['ori_mac']}, plus_mac: {per_result['plus_mac']}, ori_access: {per_result['ori_access']},plus_access: {per_result['plus_access']}, cpb: {per_result['cpb']}, TS: {per_result['TS']}\n")
 
 
 
@@ -516,7 +519,7 @@ def calc_flops_for_supernet(global_settings, dataset, supernet, width_multiplier
 
     while True:
         needs_subnets = n
-        print(f'Sampling {needs_subnets} more subnet(s)')
+        #print(f'Sampling {needs_subnets} more subnet(s)')
 
         all_subnet_configs = list(itertools.islice(all_subnet_configs_lst_generator, needs_subnets))
         batched_subnet_configs = np.array_split(all_subnet_configs, available_cpus)
@@ -535,7 +538,7 @@ def calc_flops_for_supernet(global_settings, dataset, supernet, width_multiplier
             all_check_sp_results.append(check_sp_results_per_cpu)
 
         constraint_stats = merge_constraint_stats(all_constraint_stats)
-        print(constraint_stats)
+        #print(constraint_stats)
 
         # break when there are enough subnets
         if len(all_subnet_results) >= n:

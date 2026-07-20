@@ -183,11 +183,11 @@ def check_constraints(performance_model: PlatPerf, subnet_latency_info, subnet_o
     if 'CHK_PASS_RESPONSIVENESS' in checked_constraints:
         if performance_model.PLAT_SETTINGS['LAT_E2E_REQ'] > 0:
             pass_latency_constraint, _, _ = cnn.pass_constraint_responsiveness(latency, performance_model.PLAT_SETTINGS)
-            print("check latency_pass = ", pass_latency_constraint)
+            # print("check latency_pass = ", pass_latency_constraint)
             
             if pass_latency_constraint:
                 constraint_stats['latency_feasible_subnets'] += 1
-                print("## Pass_latency_constraint: latency",  latency, "is under constraint ",performance_model.PLAT_SETTINGS['LAT_E2E_REQ'] )
+                # print("## Pass_latency_constraint: latency",  latency, "is under constraint ",performance_model.PLAT_SETTINGS['LAT_E2E_REQ'] )
 
             pass_constraints = pass_constraints and pass_latency_constraint
         else:
@@ -205,23 +205,23 @@ def check_constraints(performance_model: PlatPerf, subnet_latency_info, subnet_o
             else:
                 vm_pass = check_vm_constraint(performance_model, subnet_obj, subnet_name, subnet_cpb, constraint_stats)
             
-            print("check vm_pass = ", vm_pass)
+            #print("check vm_pass = ", vm_pass)
             pass_constraints = pass_constraints and vm_pass
 
             # if not vm_pass:
             #     print("check under_mem_TF = ", under_mem)
             #     pass_constraints = pass_constraints or under_mem
             
-            if pass_constraints:
-                print("## Pass vm_constraint")
+            # if pass_constraints:
+            #     print("## Pass vm_constraint")
 
         if 'CHK_PASS_STORAGE' in checked_constraints:
             nvm_pass = check_nvm_constraint(performance_model, subnet_obj, subnet_name, subnet_cpb, constraint_stats)
-            print("check nvm_pass = ", nvm_pass)
+            #print("check nvm_pass = ", nvm_pass)
             pass_constraints = pass_constraints and nvm_pass
 
-            if pass_constraints:
-                print("## Pass nvm_constraint")
+            # if pass_constraints:
+            #     print("## Pass nvm_constraint")
 
 
         #if 'CHK_PASS_ATOMICITY' in checked_constraints:

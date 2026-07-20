@@ -24,7 +24,13 @@ def _extract_static_shape(name, value_info):
 
 def _resolve_numpy_dtype(name, value_info):
     tensor_type = value_info.type.tensor_type
-    dtype = onnx.mapping.TENSOR_TYPE_TO_NP_TYPE.get(tensor_type.elem_type)
+    # dtype = onnx.mapping.TENSOR_TYPE_TO_NP_TYPE.get(tensor_type.elem_type)
+    try:
+        from onnx import mapping
+        dtype = mapping.TENSOR_TYPE_TO_NP_TYPE.get(tensor_type.elem_type)
+    except Exception:
+        from onnx.helper import tensor_dtype_to_np_dtype
+        dtype = tensor_dtype_to_np_dtype(tensor_type.elem_type)
     assert dtype is not None, f"input {name} has unsupported dtype {tensor_type.elem_type}"
     return dtype
 

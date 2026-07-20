@@ -324,11 +324,19 @@ def run_supernet_train(rank, world_size, queue, global_settings: Settings, datas
                 if rank == 0:
                     if not global_settings.NAS_SETTINGS_GENERAL['SEARCH_TIME_TESTING']:
                         supernet_chkpt_fname_with_timestamp = supernet_chkpt_fname.replace('.pth', str(datetime.datetime.now().strftime('-%Y%m%d-%H%M%S')) + '.pth')
-                        torch.save({
-                            'model': model.state_dict(),
-                            'settings': str(global_settings),
-                        }, supernet_chkpt_fname_with_timestamp)
-                        logging.info('Save best checkpoints to %s' % supernet_chkpt_fname_with_timestamp)
+
+                        if (fine_tune_subnet_blkchoices_ixs==None):
+                            torch.save({
+                                'model': model.state_dict(),
+                                'settings': str(global_settings),
+                            }, supernet_chkpt_fname)
+                            logging.info('Save best checkpoints to %s' % supernet_chkpt_fname)
+                        else:
+                            torch.save({
+                                'model': model.state_dict(),
+                                'settings': str(global_settings),
+                            }, supernet_chkpt_fname_with_timestamp)
+                            logging.info('Save best checkpoints to %s' % supernet_chkpt_fname_with_timestamp)
                     else:
                         logging.info('Testing search time, skipping saving checkpoints')
                 else:

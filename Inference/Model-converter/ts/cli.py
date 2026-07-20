@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import onnx
 
@@ -12,15 +13,35 @@ def _parse_args():
     parser.add_argument("input", help="Path to input ONNX model")
     parser.add_argument("config", help="Path to split configuration JSON")
     parser.add_argument("output", help="Path to output ONNX model")
+    parser.add_argument(
+        "--ts-method",
+        choices=["auto", "dupnas", "tinyts", "patchts", "nots"],
+        default="auto",
+        help="TS method. auto infers from ONNX filename.",
+    )
     return parser.parse_args()
+
+
+def _infer_ts_method_from_name(path):
+    name = Path(path).name.lower()
+    for method in ("dupnas", "tinyts", "patchts", "nots"):
+        if method in name:
+            return method
+    return "unknown"
 
 
 def main():
     args = _parse_args()
 
+    ts_method = args.ts_method
+    if ts_method == "auto":
+        ts_method = _infer_ts_method_from_name(args.input)
+
+    print(f"[TS] inferred method: {ts_method}")
+
     model = onnx.load(args.input)
     groups = parse_config(args.config)
-    rewritten = rewrite_model(model, groups)
+    rewritten = rewrite_model(model, groups, ts_method=ts_method)
     onnx.save(rewritten, args.output)
 
     ok, diffs = verify_model(model, rewritten)

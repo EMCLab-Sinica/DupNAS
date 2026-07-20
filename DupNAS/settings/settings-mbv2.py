@@ -228,6 +228,7 @@ class Settings(object): ##default settintgs & discription
         'DEBUG_ENABLED' : False,
         'ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/NASBase/onnx_model/",
         'GEN_ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/genonnx/"+ NAS_SETTINGS_GENERAL['ARC']+'/',
+        # 'SAMPLE_ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/sample_onnx/"+ NAS_SETTINGS_GENERAL['ARC']+'/',
 
         # 'LATENCY_RATIO' : 2,
         # 'LATENCY_PROXY' : 532837563 ,

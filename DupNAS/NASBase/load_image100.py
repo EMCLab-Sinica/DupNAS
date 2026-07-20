@@ -8,7 +8,7 @@
 
 import sys, os
 from os.path import dirname, realpath
-#import kagglehub
+import kagglehub
 import shutil
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
@@ -20,12 +20,11 @@ from settings import Settings
 
 # Define dataset paths
 DATASET_DIR = Settings.NAS_SETTINGS_PER_DATASET['IMAGE100']['TRAIN_DATADIR']  # Change if needed
-#KAGGLEHUB_DIR = os.path.expanduser("~/.cache/kagglehub/datasets/ambityga/imagenet100/versions/8")
+KAGGLEHUB_DIR = os.path.expanduser("~/.cache/kagglehub/datasets/ambityga/imagenet100/versions/8")
 
 
 def load_image100_dataset(DATASET_DIR=DATASET_DIR):
-
-    KAGGLEHUB_DIR = os.path.expanduser("/4TB/cyliu901/.cache/kagglehub/datasets/ambityga/imagenet100/versions/8")
+    KAGGLEHUB_DIR = os.path.expanduser("~/.cache/kagglehub/datasets/ambityga/imagenet100/versions/8")
     
     #Step 1: Download ImageNet-100 dataset
     if not os.path.exists(KAGGLEHUB_DIR):

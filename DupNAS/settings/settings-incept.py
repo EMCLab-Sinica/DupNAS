@@ -191,7 +191,7 @@ class Settings(object): ##default settintgs & discription
     # Search space optimization default settings    
     NAS_SSOPTIMIZER_SETTINGS = {
         'SUBNET_SAMPLE_SIZE' : 200,    
-        'VALID_SUBNETS_THRESHOLD': 0.25, # 0.05 or some other ratios
+        'VALID_SUBNETS_THRESHOLD': 0.10, # 0.05 or some other ratios
         'DO_RESAMPLING': False,
         'SSOPT_POLICY' : SSOptPolicy.FLOPS,
         # specify which constraints to consider
@@ -211,7 +211,7 @@ class Settings(object): ##default settintgs & discription
         'MUT_PROB': 0.05,    # probability
         'MUT_RATIO': 0.5,    #
         'EVOSEARCH_LOGFNAME' : CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + GLOBAL_SETTINGS['EXP_SUFFIX'] + "_evosearchlog.json",   
-        'EVOSEARCH_SCORE_TYPE' : 'ACC',
+        'EVOSEARCH_SCORE_TYPE' : 'ACC',  
         'EVOSEARCH_TRIALS': 10,   # different seeds  # final test need to do more
         
         # Optional: This checks only NVM constraints, and it is only for getting results in a shorter time.        
@@ -228,11 +228,12 @@ class Settings(object): ##default settintgs & discription
         'DEBUG_ENABLED' : False,
         'ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/NASBase/onnx_model/",
         'GEN_ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/genonnx/"+ NAS_SETTINGS_GENERAL['ARC']+'/',
+        # 'SAMPLE_ONNX_FILE_PATH': CURRENT_HOME_PATH + "/DupNAS/sample_onnx/"+ NAS_SETTINGS_GENERAL['ARC']+'/',
 
         # 'LATENCY_RATIO' : 2,
-        # 'LATENCY_PROXY' : 52495968,
-
-             
+        # 'LATENCY_PROXY' : 532837563 ,
+        
+    
     }
 
 
@@ -255,7 +256,7 @@ class Settings(object): ##default settintgs & discription
             'MUT_PROB_PER_BLOCK': [0.05, 0.05, 0.05, 0.05],
             # For exploitation, later during evo search, same prob as default
             'MUT_PROB_PER_BLOCK_EXPLOITATION': [0.05, 0.05, 0.05, 0.05],
-            # For exploration, earlier during evo search, higher for first block
+            # For exploration, earlier during evo search, higher for first block 
             'MUT_PROB_PER_BLOCK_EXPLORATION': [0.2, 0.05, 0.05, 0.05],
             # After N generations, switching from exploration to exploitation
             'BEST_STABLE_GENERATIONS': 5,
@@ -293,7 +294,7 @@ class Settings(object): ##default settintgs & discription
             'DROPPING_ENABLED': False,
         }
 
-    
+   
     elif arc == 'mbv2':
         DupNAS['STAGE1_SETTINGS'] = {
             'DROPPING_BLOCK_LEVEL': {
@@ -412,7 +413,7 @@ class Settings(object): ##default settintgs & discription
             'INPUT_RESOLUTION': INCEPT_INPUT_RESOLUTION_IMAGE100,
         })
 
-   
+    
     elif arc == 'mbv2':
         cifar10_base.update({
             'OUT_CH_PER_BLK': MOBILENET_V2_NUM_OUT_CHANNELS_CIFAR10,
@@ -553,7 +554,7 @@ def arg_parser(test_settings):
                     help="Choose one of: mobile, shuffle, incept")
     parser.add_argument("--mode", type=str, default="dupnas", choices=["dupnas", "tinyts", "patchts", "nots"],
                     help="Choose one of: dupnas, tinyts, patchts, nots")
-    parser.add_argument("--priority", type=str, default="bal", choices=["bal", "mem"], 
+    parser.add_argument("--priority", type=str, default="bal", choices=["bal", "mem"],  
                     help="Choose one of: pdq, bal, mem (goal)")
     parser.add_argument("--export_file", action='store_true',
                     help="Enable exporting reports and figures")
@@ -611,7 +612,8 @@ def arg_parser(test_settings):
         print('ARG_SET_SUFFIX : ', args.suffix)
         test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] = args.suffix
 
-   if 'stages' in args:
+   
+    if 'stages' in args:
         print('ARG_STAGES : ', args.stages)
         test_settings.NAS_SETTINGS_GENERAL['STAGES'] = args.stages
     if 'tr_sup_fname' in args:
@@ -636,7 +638,6 @@ def arg_parser(test_settings):
     test_settings.NAS_SSOPTIMIZER_SETTINGS['SSOPT_TRAINED_SUPERNET_FNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + '_trsupnetresults.json'
     test_settings.NAS_EVOSEARCH_SETTINGS['EVOSEARCH_LOGFNAME'] = CURRENT_HOME_PATH + "/DupNAS/NASBase/train_log/" + test_settings.GLOBAL_SETTINGS['EXP_SUFFIX'] + "_evosearchlog.json"
 
-   
     print(str(test_settings))
 
 
