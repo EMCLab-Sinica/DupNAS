@@ -1,0 +1,6 @@
+incept-im100-vm128-DupNAS-MC-0_w0.5_ir128_split_full_integer_quant.tflite
+incept-im100-vm128-DupNAS-MC-10_w0.5_ir128_split_full_integer_quant.tflite
+incept-im100-vm128-DupNAS-MC-44_w0.5_ir128_split_full_integer_quant.tflite
+incept-im100-vm128-dupnas_w0.5_ir128_ts_full_integer_quant.tflite
+incept-vm128-DupNAS-LC3N_w0.5_ir128_split_full_integer_quant.tflite
+incept-vm128-DupNAS-LCN_w0.5_ir128_split_full_integer_quant.tflite

@@ -1,0 +1,4 @@
+model,top1_accuracy,top5_accuracy
+mbv2-im100-vm128-dupnas_w0.25_ir128.onnx,62.08%,85.36%
+mbv2-im100-vm256-dupnas_w0.25_ir128.onnx,62.64%,84.80%
+mbv2-im100-vm96-dupnas_w0.25_ir96.onnx,58.40%,82.64%

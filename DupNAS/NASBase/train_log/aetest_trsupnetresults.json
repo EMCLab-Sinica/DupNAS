@@ -1,0 +1,5 @@
+{
+    "supernet_best_ckpt": "/4TB/aeuser/DupNAS-AE/DupNAS/NASBase/train_log/aetest_supernet_shuffle_best.pth",
+    "best_val_acc": 29.84,
+    "best_val_loss": 3.0082180595397947
+}

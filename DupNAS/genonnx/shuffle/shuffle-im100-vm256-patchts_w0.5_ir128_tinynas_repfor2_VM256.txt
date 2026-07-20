@@ -1,0 +1,19 @@
+ Full_duration: 1.4745826721191406(s)
+ Peak node list:[]
+----------------------------------------
+----------------------------------------
+ Patch selected by min memory: 
+ Start Op: 0, End Op: 0
+ Patch Split q: 1
+ >>> Total Peak Memory : 196608 bytes (192 KB)
+ Peak Memory Usage within Patch: 0 bytes (0 KB)
+ Peak Memory Usage per layer: 196608 bytes (192 KB)
+ >>> full mac plus: 0
+ >>> full access plus : 0
+ full mac ori: 427556864
+ full access ori : 389936
+ Within Patch: 
+ -- mac_ori : 427556864
+ -- mac_gap : 0
+ -- access_ori : 389936
+ -- access_gap : 0

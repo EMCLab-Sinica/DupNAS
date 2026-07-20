@@ -1,0 +1,75 @@
+cd DupNAS/sample_onnx/<model>
+bash run_allsamples_vm96.sh <output_dir> python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir <output_dir> --model <model> --vm <vm_setting>
+
+==========================
+Figure 6 
+Use these in actions:
+
+options: shufflenet-vm96
+cd DupNAS/sample_onnx/shufflenet
+bash run_allsamples_vm96.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model shufflenet --vm 96
+
+options: shufflenet-vm128
+cd DupNAS/sample_onnx/shufflenet
+bash run_allsamples_vm128.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model shufflenet --vm 128
+
+options: shufflenet-vm256
+cd DupNAS/sample_onnx/shufflenet
+bash run_allsamples_vm256.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model shufflenet --vm 256
+
+options: mobilenet-vm96
+cd DupNAS/sample_onnx/mobilenet
+bash run_allsamples_vm96.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model mobilenet --vm 96
+
+options: mobilenet-vm128
+cd DupNAS/sample_onnx/mobilenet
+bash run_allsamples_vm128.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model mobilenet --vm 128
+
+options: mobilenet-vm256
+cd DupNAS/sample_onnx/mobilenet
+bash run_allsamples_vm256.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model mobilenet --vm 256
+
+options: inception-vm96
+cd DupNAS/sample_onnx/inception
+bash run_allsamples_vm96.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model inception --vm 96
+
+options: inception-vm128
+cd DupNAS/sample_onnx/inception
+bash run_allsamples_vm128.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model inception --vm 128
+
+options: inception-vm256
+cd DupNAS/sample_onnx/inception
+bash run_allsamples_vm256.sh ../outputs python3.9
+cd DupNAS/sample_onnx
+python3.9 analyze_all_output_dupnasa.py --output_dir ./outputs --model inception --vm 256
+
+
+==========================
+
+/// Output files ///
+all results (can download to check): sample_onnx/outputs/<model>_<vm_setting>_detail.csv
+summary results (shown in console): sample_onnx/outputs/<model>_<vm_setting>_summary.csv
+
+
+
+
+
+

@@ -1,0 +1,58 @@
+under_mem:True
+peak node list:[6, 7, 8, 9, 5, 1, 0, 30, 31, 32]
+Full_duration:1.553839921951294(s)
+Peak memory for all: : 89856 bytes (87 KB)
+Peak memory under dup: : 86400 bytes (84 KB)
+ori MAC: 589953024
+ori weight access: 2669208
+
+Total MAC increased: 117089280
+Total weight access increased: 892944
+
+The useful subgraphs idx: [0, 1, 2]
+remaining_peaks: []
+
+Total PDQ Configuration Details
+========================================
+Subgraph #1
+  Subgraph Ops: [4, 5, 6, 7, 8, 9, 10]
+  Original Peak Memory: 456192
+  Optimized Peak Memory: 85248
+  Peak Operator Index: 6
+  Duplication Config:
+    under memory constraint: True
+    Selected d: [4, 5, 6, 7, 8, 9, 10]
+    d_candidate_num: [[4, 5, 6, 7, 8, 9, 10]]
+    Selected q: 6
+    q_candidates: [2, 3, 4, 6, 8, 12, 16, 24]
+    Total Memory Under q: [16128, 39168, 73728, 73728, 73728, 39168, 13824, 16128, 41472, 76032, 76032, 76032, 41472, 13824, 16128, 43776, 78336, 78336, 78336, 43776, 13824, 16128, 46080, 80640, 80640, 80640, 46080, 13824, 16128, 48384, 82944, 82944, 82944, 48384, 13824, 16128, 50688, 85248, 85248, 85248, 50688, 13824]
+    Final Peak Memory: 85248
+----------------------------------------
+Subgraph #2
+  Subgraph Ops: [0, 1, 2]
+  Original Peak Memory: 184320
+  Optimized Peak Memory: 86016
+  Peak Operator Index: 1
+  Duplication Config:
+    under memory constraint: True
+    Selected d: [0, 1, 2]
+    d_candidate_num: 1
+    Selected q: 3
+    q_candidates: [2, 3, 4, 6, 8, 12, 16, 24]
+    Total Memory Under q: [76800, 79872, 43008, 79872, 82944, 46080, 82944, 86016, 49152]
+    Final Peak Memory: 86016
+----------------------------------------
+Subgraph #3
+  Subgraph Ops: [28, 29, 30, 31, 32, 33, 34]
+  Original Peak Memory: 172800
+  Optimized Peak Memory: 86400
+  Peak Operator Index: 30
+  Duplication Config:
+    under memory constraint: True
+    Selected d: [28, 29, 30, 31, 32, 33, 34]
+    d_candidate_num: [[28, 29, 30, 31, 32, 33, 34]]
+    Selected q: 2
+    q_candidates: [2, 3, 4, 6, 8, 12]
+    Total Memory Under q: [10368, 44928, 82944, 82944, 82944, 44928, 6912, 10368, 48384, 86400, 86400, 86400, 48384, 6912]
+    Final Peak Memory: 86400
+----------------------------------------

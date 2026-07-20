@@ -1,0 +1,3 @@
+incept-im100-vm96-DupNAS-MC-2_w0.75_ir96_split_full_integer_quant.tflite
+incept-im100-vm96-DupNAS-MC-8_w0.75_ir96_split_full_integer_quant.tflite
+incept-im100-vm96-dupnas_w0.75_ir96_ts_full_integer_quant.tflite

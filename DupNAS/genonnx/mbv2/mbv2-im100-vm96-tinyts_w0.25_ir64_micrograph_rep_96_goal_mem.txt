@@ -1,0 +1,145 @@
+Full_duration:1.6661617755889893(s)
+peak node list:[6, 7, 8, 18, 19, 20]
+MICROGRAPH_duration:0.00265(s)
+Peak memory: : 71872 bytes (70 KB)
+ori MAC: 287465472
+ori weight access: 3810168
+
+Total MAC increased: 84400128
+Total weight access increased: 679536
+
+
+Micro-Graph 0: [5, 6, 7, 8, 9]
+peak_mem_per_micro: (71872, 'bfs', 1)
+    -> Need to duplicate Op 5 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 6 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 7 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 8 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 9 x32 for split input tensor num: 32 
+
+Micro-Graph 1: [17, 18, 19, 20, 21]
+peak_mem_per_micro: (55488, 'bfs', 1)
+    -> Need to duplicate Op 17 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 18 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 19 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 20 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 21 x32 for split input tensor num: 32 
+
+Micro-Graph 2: [0, 1, 2, 3]
+peak_mem_per_micro: (46400, 'dfs', 1)
+    -> Need to duplicate Op 0 x64 for split input tensor num: 64 
+    -> Need to duplicate Op 1 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 2 x32 for split input tensor num: 32 
+    -> Need to duplicate Op 3 x32 for split input tensor num: 32 
+
+Micro-Graph 3: [41, 42, 43, 44, 45]
+peak_mem_per_micro: (52224, None, None)
+    -> Need to duplicate Op 41 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 42 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 43 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 44 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 45 x1 for split input tensor num: 1 
+
+Micro-Graph 4: [53, 54, 55, 56, 57]
+peak_mem_per_micro: (52224, None, None)
+    -> Need to duplicate Op 53 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 54 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 55 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 56 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 57 x1 for split input tensor num: 1 
+
+Micro-Graph 5: [29, 30, 31, 32, 33]
+peak_mem_per_micro: (27648, None, None)
+    -> Need to duplicate Op 29 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 30 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 31 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 32 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 33 x1 for split input tensor num: 1 
+
+Micro-Graph 6: [11, 12, 13, 14, 15]
+peak_mem_per_micro: (24576, None, None)
+    -> Need to duplicate Op 11 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 12 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 13 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 14 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 15 x1 for split input tensor num: 1 
+
+Micro-Graph 7: [23, 24, 25, 26, 27]
+peak_mem_per_micro: (24576, None, None)
+    -> Need to duplicate Op 23 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 24 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 25 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 26 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 27 x1 for split input tensor num: 1 
+
+Micro-Graph 8: [65, 66, 67, 68, 69]
+peak_mem_per_micro: (13824, None, None)
+    -> Need to duplicate Op 65 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 66 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 67 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 68 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 69 x1 for split input tensor num: 1 
+
+Micro-Graph 9: [35, 36, 37, 38, 39]
+peak_mem_per_micro: (12288, None, None)
+    -> Need to duplicate Op 35 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 36 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 37 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 38 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 39 x1 for split input tensor num: 1 
+
+Micro-Graph 10: [47, 48, 49, 50, 51]
+peak_mem_per_micro: (12288, None, None)
+    -> Need to duplicate Op 47 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 48 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 49 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 50 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 51 x1 for split input tensor num: 1 
+
+Micro-Graph 11: [59, 60, 61, 62, 63]
+peak_mem_per_micro: (12288, None, None)
+    -> Need to duplicate Op 59 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 60 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 61 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 62 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 63 x1 for split input tensor num: 1 
+
+Micro-Graph 12: [89, 90, 91, 92, 93]
+peak_mem_per_micro: (9984, None, None)
+    -> Need to duplicate Op 89 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 90 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 91 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 92 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 93 x1 for split input tensor num: 1 
+
+Micro-Graph 13: [71, 72, 73, 74, 75]
+peak_mem_per_micro: (6144, None, None)
+    -> Need to duplicate Op 71 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 72 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 73 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 74 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 75 x1 for split input tensor num: 1 
+
+Micro-Graph 14: [77, 78, 79, 80, 81]
+peak_mem_per_micro: (5376, None, None)
+    -> Need to duplicate Op 77 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 78 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 79 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 80 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 81 x1 for split input tensor num: 1 
+
+Micro-Graph 15: [83, 84, 85, 86, 87]
+peak_mem_per_micro: (3072, None, None)
+    -> Need to duplicate Op 83 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 84 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 85 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 86 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 87 x1 for split input tensor num: 1 
+
+Micro-Graph 16: [95, 96]
+peak_mem_per_micro: (3072, None, None)
+    -> Need to duplicate Op 95 x1 for split input tensor num: 1 
+    -> Need to duplicate Op 96 x1 for split input tensor num: 1 
+
+Unsplittable Operators:
+

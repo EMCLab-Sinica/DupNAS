@@ -1,0 +1,3 @@
+mbv2-im100-vm96-dupnas-MC-31_w0.25_ir96_split_full_integer_quant.tflite
+mbv2-im100-vm96-dupnas-MC-50_w0.25_ir96_split_full_integer_quant.tflite
+mbv2-im100-vm96-dupnas_w0.25_ir96_ts_full_integer_quant.tflite

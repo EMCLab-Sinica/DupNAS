@@ -1,0 +1,50 @@
+ Full_duration: 1.4193344116210938(s)
+ Peak node list:[6, 7, 8, 1, 0, 9, 5]
+----------------------------------------
+ Patch selected by min latency/comp: 
+ Start Op: 0, End Op: 9
+ Patch Split q: 2
+ >>> Total Peak Memory : 192512 bytes (188 KB)
+ Peak Memory Usage within Patch: 192512 bytes (188 KB)
+ Peak Memory Usage per layer: 159744 bytes (156 KB)
+ >>> full mac plus: 33939648
+ >>> full access plus : 161856
+ full mac ori: 803045376
+ full access ori : 5442696
+ Within Patch: 
+ -- mac_ori : 199360512
+ -- mac_gap : 33939648
+ -- access_ori : 40464
+ -- access_gap : 161856
+----------------------------------------
+ Patch selected by min memory: 
+ Start Op: 0, End Op: 9
+ Patch Split q: 4
+ >>> Total Peak Memory : 159744 bytes (156 KB)
+ Peak Memory Usage within Patch: 103424 bytes (101 KB)
+ Peak Memory Usage per layer: 159744 bytes (156 KB)
+ >>> full mac plus: 83627712
+ >>> full access plus : 647424
+ full mac ori: 803045376
+ full access ori : 5442696
+ Within Patch: 
+ -- mac_ori : 199360512
+ -- mac_gap : 83627712
+ -- access_ori : 40464
+ -- access_gap : 647424
+----------------------------------------
+ Patch selected by min memory: 
+ Start Op: 0, End Op: 8
+ Patch Split q: 4
+ >>> Total Peak Memory : 311296 bytes (304 KB)
+ Peak Memory Usage within Patch: 303104 bytes (296 KB)
+ Peak Memory Usage per layer: 311296 bytes (304 KB)
+ >>> full mac plus: 83627712
+ >>> full access plus : 641280
+ full mac ori: 803045376
+ full access ori : 5442696
+ Within Patch: 
+ -- mac_ori : 197787648
+ -- mac_gap : 83627712
+ -- access_ori : 40080
+ -- access_gap : 641280

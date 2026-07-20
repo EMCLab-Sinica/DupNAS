@@ -1,0 +1,24 @@
+cd TStime
+bash random_run_TStime.sh <model> python3.9 [random_seed]
+
+==========================
+Figure 9 
+Use these in actions:
+
+options: shufflenet
+cd TStime
+bash random_run_TStime.sh shufflenet python3.9 0
+
+options: mobilenet
+cd TStime
+bash random_run_TStime.sh mobilenet python3.9 0
+
+options: inception
+cd TStime
+bash random_run_TStime.sh inception python3.9 0
+
+==========================
+
+/// Output files ///
+all results (can download to check): TStime/<model>/<model>_random100_seed<random_seed>_all_vm_runtime_ms.txt
+summary results (shown in console): TStime/<model>_random100_seed<random_seed>_300runs_summary.csv

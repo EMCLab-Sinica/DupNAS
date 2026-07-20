@@ -1,0 +1,4 @@
+model,top1_accuracy,top5_accuracy
+shuffle-im100-vm128-dupnas_w0.5_ir128.onnx,62.96%,85.36%
+shuffle-im100-vm256-dupnas_w0.8_ir96.onnx,65.76%,87.76%
+shuffle-im100-vm96-dupnas_w0.5_ir128.onnx,61.36%,85.36%

@@ -1,0 +1,30 @@
+under_mem:True
+peak node list:[36]
+Full_duration:1.5857625007629395(s)
+Peak memory for all: : 177408 bytes (173 KB)
+Peak memory under dup: : 131328 bytes (128 KB)
+ori MAC: 410308992
+ori weight access: 415192
+
+Total MAC increased: 31190400
+Total weight access increased: 153064
+
+The useful subgraphs idx: [0]
+remaining_peaks: []
+
+Total PDQ Configuration Details
+========================================
+Subgraph #1
+  Subgraph Ops: [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+  Original Peak Memory: 262656
+  Optimized Peak Memory: 131328
+  Peak Operator Index: 36
+  Duplication Config:
+    under memory constraint: True
+    Selected d: [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+    d_candidate_num: [[34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44], [34, 39, 40, 41, 42, 43, 35, 36, 37, 38, 44]]
+    Selected q: 2
+    q_candidates: [2, 3, 4, 6, 8, 12]
+    Total Memory Under q: [131328, 87552, 87552, 54720, 21888, 65664, 32832, 32832, 32832, 32832, 65664, 109440, 109440, 109440, 76608, 43776, 87552, 54720, 54720, 54720, 54720, 43776]
+    Final Peak Memory: 131328
+----------------------------------------

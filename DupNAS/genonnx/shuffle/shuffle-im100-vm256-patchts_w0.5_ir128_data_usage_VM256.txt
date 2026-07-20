@@ -1,0 +1,595 @@
+--- Tensor 0 ---
+Name: input
+From Ops: []
+To Ops: [0]
+Shape: [1, 3, 128, 128]
+Size (bytes): 49152
+
+--- Tensor 1 ---
+Name: input.4
+From Ops: [0]
+To Ops: [1]
+Shape: [1, 16, 64, 64]
+Size (bytes): 65536
+
+--- Tensor 2 ---
+Name: input.12
+From Ops: [1]
+To Ops: [2, 6]
+Shape: [1, 16, 64, 64]
+Size (bytes): 65536
+
+--- Tensor 3 ---
+Name: input.20
+From Ops: [2]
+To Ops: [3]
+Shape: [1, 16, 64, 64]
+Size (bytes): 65536
+
+--- Tensor 4 ---
+Name: onnx::Conv_195
+From Ops: [3]
+To Ops: [4]
+Shape: [1, 16, 64, 64]
+Size (bytes): 65536
+
+--- Tensor 5 ---
+Name: input.28
+From Ops: [4]
+To Ops: [5]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 6 ---
+Name: onnx::Concat_198
+From Ops: [5]
+To Ops: [11]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 7 ---
+Name: input.36
+From Ops: [6]
+To Ops: [7]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 8 ---
+Name: onnx::Conv_201
+From Ops: [7]
+To Ops: [8]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 9 ---
+Name: input.44
+From Ops: [8]
+To Ops: [9]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 10 ---
+Name: input.52
+From Ops: [9]
+To Ops: [10]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 11 ---
+Name: onnx::Concat_206
+From Ops: [10]
+To Ops: [11]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 12 ---
+Name: onnx::Reshape_207
+From Ops: [11]
+To Ops: [12]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 13 ---
+Name: onnx::Transpose_220
+From Ops: [12]
+To Ops: [13]
+Shape: [1, 2, 12, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 14 ---
+Name: onnx::Reshape_221
+From Ops: [13]
+To Ops: [14]
+Shape: [1, 12, 2, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 15 ---
+Name: input.56
+From Ops: [14]
+To Ops: [15, 17]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 16 ---
+Name: input.64
+From Ops: [15]
+To Ops: [16]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 17 ---
+Name: onnx::Concat_230
+From Ops: [16]
+To Ops: [22]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 18 ---
+Name: input.72
+From Ops: [17]
+To Ops: [18]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 19 ---
+Name: onnx::Conv_233
+From Ops: [18]
+To Ops: [19]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 20 ---
+Name: input.80
+From Ops: [19]
+To Ops: [20]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 21 ---
+Name: input.88
+From Ops: [20]
+To Ops: [21]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 22 ---
+Name: onnx::Concat_238
+From Ops: [21]
+To Ops: [22]
+Shape: [1, 12, 32, 32]
+Size (bytes): 12288
+
+--- Tensor 23 ---
+Name: onnx::Reshape_239
+From Ops: [22]
+To Ops: [23]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 24 ---
+Name: onnx::Transpose_252
+From Ops: [23]
+To Ops: [24]
+Shape: [1, 2, 12, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 25 ---
+Name: onnx::Reshape_253
+From Ops: [24]
+To Ops: [25]
+Shape: [1, 12, 2, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 26 ---
+Name: input.92
+From Ops: [25]
+To Ops: [26, 28]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 27 ---
+Name: input.100
+From Ops: [26]
+To Ops: [27]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 28 ---
+Name: onnx::Concat_262
+From Ops: [27]
+To Ops: [33]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 29 ---
+Name: input.108
+From Ops: [28]
+To Ops: [29]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 30 ---
+Name: onnx::Conv_265
+From Ops: [29]
+To Ops: [30]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 31 ---
+Name: input.116
+From Ops: [30]
+To Ops: [31]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 32 ---
+Name: input.124
+From Ops: [31]
+To Ops: [32]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 33 ---
+Name: onnx::Concat_270
+From Ops: [32]
+To Ops: [33]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 34 ---
+Name: onnx::Reshape_271
+From Ops: [33]
+To Ops: [34]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 35 ---
+Name: onnx::Transpose_284
+From Ops: [34]
+To Ops: [35]
+Shape: [1, 2, 24, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 36 ---
+Name: onnx::Reshape_285
+From Ops: [35]
+To Ops: [36]
+Shape: [1, 24, 2, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 37 ---
+Name: input.128
+From Ops: [36]
+To Ops: [37, 39]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 38 ---
+Name: input.136
+From Ops: [37]
+To Ops: [38]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 39 ---
+Name: onnx::Concat_294
+From Ops: [38]
+To Ops: [44]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 40 ---
+Name: input.144
+From Ops: [39]
+To Ops: [40]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 41 ---
+Name: onnx::Conv_297
+From Ops: [40]
+To Ops: [41]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 42 ---
+Name: input.152
+From Ops: [41]
+To Ops: [42]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 43 ---
+Name: input.160
+From Ops: [42]
+To Ops: [43]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 44 ---
+Name: onnx::Concat_302
+From Ops: [43]
+To Ops: [44]
+Shape: [1, 24, 32, 32]
+Size (bytes): 24576
+
+--- Tensor 45 ---
+Name: onnx::Reshape_303
+From Ops: [44]
+To Ops: [45]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 46 ---
+Name: onnx::Transpose_316
+From Ops: [45]
+To Ops: [46]
+Shape: [1, 2, 24, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 47 ---
+Name: onnx::Reshape_317
+From Ops: [46]
+To Ops: [47]
+Shape: [1, 24, 2, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 48 ---
+Name: input.164
+From Ops: [47]
+To Ops: [48, 50]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 49 ---
+Name: input.172
+From Ops: [48]
+To Ops: [49]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 50 ---
+Name: onnx::Concat_326
+From Ops: [49]
+To Ops: [55]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 51 ---
+Name: input.180
+From Ops: [50]
+To Ops: [51]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 52 ---
+Name: onnx::Conv_329
+From Ops: [51]
+To Ops: [52]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 53 ---
+Name: input.188
+From Ops: [52]
+To Ops: [53]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 54 ---
+Name: input.196
+From Ops: [53]
+To Ops: [54]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 55 ---
+Name: onnx::Concat_334
+From Ops: [54]
+To Ops: [55]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 56 ---
+Name: onnx::Reshape_335
+From Ops: [55]
+To Ops: [56]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 57 ---
+Name: onnx::Transpose_348
+From Ops: [56]
+To Ops: [57]
+Shape: [1, 2, 48, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 58 ---
+Name: onnx::Reshape_349
+From Ops: [57]
+To Ops: [58]
+Shape: [1, 48, 2, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 59 ---
+Name: input.200
+From Ops: [58]
+To Ops: [59, 61]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 60 ---
+Name: input.208
+From Ops: [59]
+To Ops: [60]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 61 ---
+Name: onnx::Concat_358
+From Ops: [60]
+To Ops: [66]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 62 ---
+Name: input.216
+From Ops: [61]
+To Ops: [62]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 63 ---
+Name: onnx::Conv_361
+From Ops: [62]
+To Ops: [63]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 64 ---
+Name: input.224
+From Ops: [63]
+To Ops: [64]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 65 ---
+Name: input.232
+From Ops: [64]
+To Ops: [65]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 66 ---
+Name: onnx::Concat_366
+From Ops: [65]
+To Ops: [66]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 67 ---
+Name: onnx::Reshape_367
+From Ops: [66]
+To Ops: [67]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 68 ---
+Name: onnx::Transpose_380
+From Ops: [67]
+To Ops: [68]
+Shape: [1, 2, 48, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 69 ---
+Name: onnx::Reshape_381
+From Ops: [68]
+To Ops: [69]
+Shape: [1, 48, 2, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 70 ---
+Name: input.236
+From Ops: [69]
+To Ops: [70, 72]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 71 ---
+Name: input.244
+From Ops: [70]
+To Ops: [71]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 72 ---
+Name: onnx::Concat_390
+From Ops: [71]
+To Ops: [77]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 73 ---
+Name: input.252
+From Ops: [72]
+To Ops: [73]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 74 ---
+Name: onnx::Conv_393
+From Ops: [73]
+To Ops: [74]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 75 ---
+Name: input.260
+From Ops: [74]
+To Ops: [75]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 76 ---
+Name: input.268
+From Ops: [75]
+To Ops: [76]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 77 ---
+Name: onnx::Concat_398
+From Ops: [76]
+To Ops: [77]
+Shape: [1, 48, 32, 32]
+Size (bytes): 49152
+
+--- Tensor 78 ---
+Name: onnx::Reshape_399
+From Ops: [77]
+To Ops: [78]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 79 ---
+Name: onnx::Transpose_412
+From Ops: [78]
+To Ops: [79]
+Shape: [1, 2, 48, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 80 ---
+Name: onnx::Reshape_413
+From Ops: [79]
+To Ops: [80]
+Shape: [1, 48, 2, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 81 ---
+Name: input.272
+From Ops: [80]
+To Ops: [81]
+Shape: [1, 96, 32, 32]
+Size (bytes): 98304
+
+--- Tensor 82 ---
+Name: onnx::Flatten_420
+From Ops: [81]
+To Ops: [82]
+Shape: [1, 96, 1, 1]
+Size (bytes): 96
+
+--- Tensor 83 ---
+Name: onnx::Gemm_421
+From Ops: [82]
+To Ops: [83]
+Shape: [1, 96]
+Size (bytes): 96
+
+--- Tensor 84 ---
+Name: output
+From Ops: [83]
+To Ops: []
+Shape: [1, 100]
+Size (bytes): 100
+

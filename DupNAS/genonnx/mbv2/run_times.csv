@@ -1,0 +1,13 @@
+model,mode,vmsize,time_ms,status
+mbv2-im100-vm96-dupnas_w0.25_ir96,dupnas,96,2698,ok
+mbv2-im100-vm96-nots_w0.25_ir32,nots,96,2539,ok
+mbv2-im100-vm96-patchts_w0.25_ir64,patchts,96,2694,ok
+mbv2-im100-vm96-tinyts_w0.25_ir64,tinyts,96,2767,ok
+mbv2-im100-vm128-dupnas_w0.25_ir128,dupnas,128,2760,ok
+mbv2-im100-vm128-nots_w0.25_ir32,nots,128,2637,ok
+mbv2-im100-vm128-patchts_w0.25_ir96,patchts,128,2699,ok
+mbv2-im100-vm128-tinyts_w0.25_ir96,tinyts,128,2832,ok
+mbv2-im100-vm256-dupnas_w0.25_ir128,dupnas,256,2638,ok
+mbv2-im100-vm256-nots_w0.25_ir64,nots,256,2648,ok
+mbv2-im100-vm256-patchts_w0.25_ir128,patchts,256,2513,ok
+mbv2-im100-vm256-tinyts_w0.25_ir128,tinyts,256,2648,ok

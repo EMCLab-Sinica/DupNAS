@@ -1,0 +1,13 @@
+model,mode,vmsize,time_ms,status
+shuffle-im100-vm96-dupnas_w0.5_ir128,dupnas,96,2774,ok
+shuffle-im100-vm96-nots_w0.5_ir32,nots,96,2708,ok
+shuffle-im100-vm96-patchts_w0.5_ir96,patchts,96,2664,ok
+shuffle-im100-vm96-tinyts_w0.5_ir96,tinyts,96,2622,ok
+shuffle-im100-vm128-dupnas_w0.5_ir128,dupnas,128,2713,ok
+shuffle-im100-vm128-nots_w0.5_ir64,nots,128,2825,ok
+shuffle-im100-vm128-patchts_w0.5_ir96,patchts,128,2604,ok
+shuffle-im100-vm128-tinyts_w0.5_ir96,tinyts,128,2589,ok
+shuffle-im100-vm256-dupnas_w0.8_ir96,dupnas,256,2719,ok
+shuffle-im100-vm256-nots_w0.5_ir96,nots,256,2798,ok
+shuffle-im100-vm256-patchts_w0.5_ir128,patchts,256,2587,ok
+shuffle-im100-vm256-tinyts_w0.8_ir96,tinyts,256,2691,ok

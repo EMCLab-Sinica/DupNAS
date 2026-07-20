@@ -1,0 +1,174 @@
+name: artifact-evaluation
+run-name: ${{ inputs.task }} / ${{ inputs.optionDisplayName }}
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        type: choice
+        required: true
+        options:
+          - fig6
+          - fig7
+          - fig8
+          - fig9
+          - fig10
+          - fig11
+          - auto_dupnas
+      option:
+        type: string
+        required: true
+      optionDisplayName:
+        type: string
+        required: true
+jobs:
+  fig6:
+    if: ${{ inputs.task == 'fig6' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig6
+        run: bash scripts/fig6.sh
+      - name: Show experiment results
+        run: cat DupNAS/sample_onnx/fig6_result.log
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: |
+            DupNAS/sample_onnx/outputs/*_vm*_detail.csv
+            DupNAS/sample_onnx/outputs/*_vm*_summary.csv
+  fig7:
+    if: ${{ inputs.task == 'fig7' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig7
+        run: bash scripts/fig7.sh
+      - name: Show experiment results
+        run: cat DupNAS/genonnx/fig7_result.log
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: DupNAS/genonnx/onnx_image100_accuracy_${{ inputs.option }}_test.csv
+  fig8:
+    if: ${{ inputs.task == 'fig8' }}
+    runs-on: [self-hosted, ae-machine]
+    env:
+      OPTION: ${{ inputs.option }}
+    defaults:
+      run:
+        working-directory: STM/
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reset USB devices
+        run: bash scripts/reset_usb.sh
+      - name: Patch repository root
+        run: bash scripts/patch_repo_root.sh
+      - name: Run fig8
+        run: bash scripts/fig8/fig8.sh
+      - name: Show experiment results
+        run: |
+          echo "============= Fig. 8 Results: STM32F746 Deployment ============="
+          {
+            echo "model_name,latency (s),accuracy (%)"
+            tail -n +2 results/tflm_f7/results.csv
+          } | column -s, -t
+          echo "=================================================================="
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: STM/results/
+  fig9:
+    if: ${{ inputs.task == 'fig9' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    timeout-minutes: 1440
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig9
+        run: bash scripts/fig9.sh
+      - name: Show experiment results
+        run: cat DupNAS/TStime/fig9_result.log
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: |
+            DupNAS/TStime/*/*_sample*_seed*_all_vm_runtime_ms.txt
+            DupNAS/TStime/*_total*runs_summary.csv
+  fig10:
+    if: ${{ inputs.task == 'fig10' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    timeout-minutes: 1440
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run fig10
+        run: bash scripts/fig10.sh
+      - name: Show experiment results
+        run: cat DupNAS/HEtest/fig10_result.log
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: DupNAS/HEtest/allseed_report_summary_*.csv
+  fig11:
+    if: ${{ inputs.task == 'fig11' }}
+    runs-on: [self-hosted, ae-machine]
+    env:
+      OPTION: ${{ inputs.option }}
+    defaults:
+      run:
+        working-directory: STM/
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reset USB devices
+        run: bash scripts/reset_usb.sh
+      - name: Patch repository root
+        run: bash scripts/patch_repo_root.sh
+      - name: Gather TFLM memory usage
+        if: ${{ contains(inputs.option, 'tflm') }}
+        run: bash scripts/gather_tflm_mem.sh
+      - name: Run fig11
+        run: bash scripts/fig11/fig11.sh
+      - name: Show experiment results
+        run: cat results/fig11_result.log
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: STM/results/
+  auto_dupnas:
+    if: ${{ inputs.task == 'auto_dupnas' }}
+    runs-on: [self-hosted, ae-server]
+    env:
+      OPTION: ${{ inputs.option }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Link models
+        run: bash scripts/link_models.sh
+      - name: Run auto_dupnas
+        run: bash scripts/auto_dupnas.sh
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: results
+          path: |
+            DupNAS/NASBase/train_log/*.json
+    

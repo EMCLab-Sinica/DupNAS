@@ -1,0 +1,25 @@
+{
+  "memory": {
+    "mempools": [
+      {
+        "name": "RAM_D1",
+        "prop": {
+          "throughput": "HIGH",
+          "latency": "LOW"
+        },
+        "usable_size": {
+          "value": "524288",
+          "magnitude": "BYTES"
+        },
+        "size": {
+          "value": "524288",
+          "magnitude": "BYTES"
+        },
+        "offset": {
+          "value": "0x24000000",
+          "magnitude": "BYTES"
+        }
+      }
+    ]
+  }
+}

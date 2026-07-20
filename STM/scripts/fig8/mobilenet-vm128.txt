@@ -1,0 +1,7 @@
+mbv2-im100-vm128-dupnas-MC-127_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas-MC-132_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas-MC-49_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas-MC-50_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas-MC-87_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas-MC-96_w0.25_ir128_split_full_integer_quant.tflite
+mbv2-im100-vm128-dupnas_w0.25_ir128_ts_full_integer_quant.tflite
