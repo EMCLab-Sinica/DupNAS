@@ -6,7 +6,8 @@
 This project develops DupNAS, a framework that integrates neural architecture search and multi-branch tensor splitting to find high-accuracy networks that are deployable on severely memory-constrained tiny MCU-class devices. To enable this integration, DupNAS shrinks the vast splitting configuration space of multi-branch networks into a smaller set of memory-optimized configurations and explores them in a lightweight manner to resolve memory bottlenecks.
 
 
-DupNAS is implemented in PyTorch on top of the popular [TinyNAS](https://github.com/mit-han-lab/mcunet) framework for MCUs, with extensions to support multi-branch networks and integration with our splitting strategy. The resulting network solutions are deployed on an [STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) microcontroller (ARM Cortex-M7 CPU, 216 MHz, 320 KB VM, and 1 MB NVM) running the TensorFlow Lite Micro (TFLite-Micro) inference engine. We evaluate DupNAS on three vision-based TinyML network families, namely MobileNetV2, ShuffleNetV2, and InceptionV3, under different memory constraints. All networks are trained on the ImageNet-100 dataset. DupNAS is compared against two existing splitting strategies, TinyTS and PatchTS.
+DupNAS is implemented in PyTorch on top of the popular [TinyNAS](https://github.com/mit-han-lab/mcunet) framework for MCUs, with extensions to support multi-branch networks and integration with our splitting strategy. The resulting network solutions are deployed on two microcontroller platforms: the [STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html), featuring a 216 MHz ARM Cortex-M7 CPU, 320 KB of VM, and 1 MB of NVM; and the [STM32H747](https://www.st.com/en/evaluation-tools/stm32h747i-disco.html), featuring a 400 MHz ARM Cortex-M7/M4 CPU, 512 KB of VM, and 1 MB of NVM. Deployment is evaluated using both the TensorFlow Lite Micro (TFLite Micro) and STM32Cube.AI inference engines.
+We evaluate DupNAS on three vision-based TinyML network families, namely MobileNetV2, ShuffleNetV2, and InceptionV3, under different memory constraints. All networks are trained on the ImageNet-100 dataset. DupNAS is compared against two existing splitting strategies, TinyTS and PatchTS.
 
 
 
@@ -46,8 +47,11 @@ Below is a brief description of the main directories and files in this repositor
   `python3.9 -m pip install -r requirements.txt`
 - [Anaconda](https://www.anaconda.com/docs/getting-started/anaconda/install/overview) (recommended for managing Python environments).
 - [ImageNet-100](https://www.kaggle.com/datasets/ambityga/imagenet100/data) dataset. 
-- [STM32F746NG MCU](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) deployment device.
-- [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) development tools for the STM32.
+- [STM32F746G-DISCO](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) deployment device.
+- [STM32H747I-DISCO](https://www.st.com/en/evaluation-tools/stm32h747i-disco.html) deployment device.
+- [STM32CubeIDE 2.1.1](https://www.st.com/en/development-tools/stm32cubeide.html) development tools for the STM32.
+- [STM32CubeMX 6.17.0](https://www.st.com/en/development-tools/stm32cubemx.html) development tools for the STM32.
+- [STM32Cube AI Studio 1.2.0](https://www.st.com/en/development-tools/stedgeai-cubeai.html) development tools and inference engine for the STM32.
 - [TensorFlow Lite Micro](https://github.com/tensorflow/tflite-micro) inference engine.
 
 ### 🔧 Setup and running DupNAS

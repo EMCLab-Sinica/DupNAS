@@ -81,6 +81,7 @@ mplcursors==0.5.2
 pyqt5==5.15.9
 onnx==1.12.0
 onnxruntime
+tflite
 
 # Use older wandb as newer wandb requires newer protobuf, which is incompatible with installed tensorflow
 # https://github.com/wandb/wandb/commit/5b9a80be2b52cfd7638c856a1a3311c9d2edf2ec

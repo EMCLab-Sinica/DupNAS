@@ -1,7 +1,11 @@
 Software requirements to compile the simulator can be found in requirements.txt 
 
+Prerequisites for running DupNAS framework:
+    CPU: Intel Xeon E5-2678 (2.5 GHz)
+    GPU: NVIDIA GTX 1080Ti (four GPUs were used for multiprocessing)
+    CUDA Version: 12.5 
 
-Prerequisites for compiling the DupNAS middleware for deployment:
+Prerequisites for compiling the DupNAS framework for deployment:
     STM32Cube AI Studio 1.2.0 (https://www.st.com/en/development-tools/stedgeai-cubeai.html)
     STM32CubeMX 6.17.0 (https://www.st.com/en/development-tools/stm32cubemx.html)
     STM32CubeIDE 2.1.1 (https://www.st.com/en/development-tools/stm32cubeide.html)
