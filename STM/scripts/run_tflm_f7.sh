@@ -92,11 +92,11 @@ while IFS= read -r MODEL || [ -n "$MODEL" ]; do
 
     kill "$RECORD_PID"
 
-    FLASH=$(grep "${MODEL_NAME}.*started" tflm-template/host.txt | awk '{print $3}' | tr -d "(" || true)
+    FLASH=$(grep "${MODEL_NAME}.*started" tflm-template/host.txt 2>/dev/null | awk '{print $3}' | tr -d "(" || true)
     FLASH=${FLASH:-NA}
     FLASH=$(scale_metric "$FLASH")
 
-    RAM=$(grep -A 1 "${MODEL_NAME}.*started" tflm-template/host.txt | grep "Arena allocation total" | awk '{print $5}' || true)
+    RAM=$(grep -A 1 "${MODEL_NAME}.*started" tflm-template/host.txt 2>/dev/null | grep "Arena allocation total" | awk '{print $5}' || true)
     RAM=${RAM:-NA}
     RAM=$(scale_metric "$RAM")
 
