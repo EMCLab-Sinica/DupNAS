@@ -239,6 +239,11 @@ def run_supernet_train(global_settings: Settings, dataset=None, supernet_chkpt_f
     if torch.cuda.is_available():
         torch.cuda.set_device(local_rank)
     
+    train_loader = None
+    val_loader = None
+    orig_train_loader = None
+    orig_val_loader = None
+
     try:
         # -- Define Supernet 
         if dataset == None:
@@ -474,36 +479,65 @@ def run_supernet_train(global_settings: Settings, dataset=None, supernet_chkpt_f
                     'best_val_acc': best_val_acc,
                 })
 
-            if _use_dist(global_settings):
-                # [ADDED] keep ranks in sync each epoch
-                torch.distributed.barrier()
+            # if _use_dist(global_settings):
+            #     # [ADDED] keep ranks in sync each epoch
+            #     torch.distributed.barrier()
 
             if _is_rank0():
                 print('\n')
 
         # [ADDED] final barrier for clean exit when distributed
-        if _use_dist(global_settings):
-            torch.distributed.barrier()
+        # if _use_dist(global_settings):
+        #     torch.distributed.barrier()
 
         return supernet_chkpt_fname, best_val_acc, best_val_loss
 
     finally:
-    # Tear down the process group after training and saving are complete.
-    # Do not add another barrier here because it may hang during shutdown.
+    # Explicitly release DataLoader iterators, workers, and pin-memory threads.
+        try:
+            del train_loader
+            del val_loader
+            del orig_train_loader
+            del orig_val_loader
+        except Exception:
+            pass
+
+        import gc
+        gc.collect()
+
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()
+
         if init_pg and dist.is_initialized():
-            print(
-                f"[Rank {_rank()}] Destroying distributed process group",
-                flush=True,
-            )
+            # print(
+            #     f"[Rank {_rank()}] Destroying distributed process group",
+            #     flush=True,
+            # )
             dist.destroy_process_group()
+
+        # print(
+        #     f"[Rank {_rank()}] run_supernet_train finished",
+        #     flush=True,
+        # )
+        
     # finally:
-    #     # [ADD] tear down PG so torchrun can exit cleanly
+    # # Tear down the process group after training and saving are complete.
+    # # Do not add another barrier here because it may hang during shutdown.
     #     if init_pg and dist.is_initialized():
-    #         try:
-    #             dist.barrier()
-    #         except Exception:
-    #             pass
+    #         print(
+    #             f"[Rank {_rank()}] Destroying distributed process group",
+    #             flush=True,
+    #         )
     #         dist.destroy_process_group()
+    # # finally:
+    # #     # [ADD] tear down PG so torchrun can exit cleanly
+    # #     if init_pg and dist.is_initialized():
+    # #         try:
+    # #             dist.barrier()
+    # #         except Exception:
+    # #             pass
+    # #         dist.destroy_process_group()
 
 if __name__ == '__main__':
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"

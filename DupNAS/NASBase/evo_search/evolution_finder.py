@@ -291,7 +291,7 @@ class EvolutionFinder:
         
         else:
             efficiency = -1 
-            print("###check_constraints###")
+            #print("###check_constraints###")
             
 
             try:  #need calculate 
@@ -300,7 +300,7 @@ class EvolutionFinder:
                         under_mem, oripeak, peak_for_all, total_pdq_config, ori_mac, plus_mac, ori_access, plus_access, max_features, cached_nvm_fit = self.op_duplication(998,sample, 0, self.net_choices)
                                 
                         if not under_mem or not cached_nvm_fit:
-                            print("[dupnas] TS doesn't help! ") #skip subnet, over constraint
+                            #print("[dupnas] TS doesn't help! ") #skip subnet, over constraint
                             self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                             self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
                             return None, None #skip subnet, over constraint
@@ -323,7 +323,7 @@ class EvolutionFinder:
                         under_mem, oripeak, peak_after_sp, micrographs, ori_mac, plus_mac, ori_access, plus_access, max_features, cached_nvm_fit = self.op_duplication(998,sample, 0, self.net_choices)
                             
                         if not under_mem or not cached_nvm_fit:
-                            print("[tinyts] TS doesn't help! ") #skip subnet, over constraint
+                            #print("[tinyts] TS doesn't help! ") #skip subnet, over constraint
                             self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                             self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
                             return None, None #skip subnet, over constraint
@@ -346,7 +346,7 @@ class EvolutionFinder:
                         under_mem, oripeak, peak_after_patch, min_latency_result, ori_mac, plus_mac, ori_access, plus_access, max_features, cached_nvm_fit = self.op_duplication(998,sample, 0, self.net_choices)
                         
                         if not under_mem or not cached_nvm_fit:
-                            print("[patchts] TS doesn't help! ") #skip subnet, over constraint
+                            #print("[patchts] TS doesn't help! ") #skip subnet, over constraint
                             self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                             self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
                             return None, None #skip subnet, over constraint
@@ -376,7 +376,7 @@ class EvolutionFinder:
                         return sample, efficiency 
                     else:
                         if self.debug_enabled: print('Skipping subnet - not all layers fit NVM or VM')
-                        print("original mem over constraint! ") #skip subnet, over constraint
+                        #print("original mem over constraint! ") #skip subnet, over constraint
                         self.evo_memory.update_tbl(sample, EvoMemTypes.NVM_FIT, cached_nvm_fit)
                         self.evo_memory.update_tbl(sample, EvoMemTypes.VM_FIT, under_mem)
                 
@@ -1265,10 +1265,10 @@ class EvolutionFinder:
         acc, child, efficiency = best_info 
 
         subnet_latency_info = self.efficiency_predictor.predict_network_latency_verbose(child, self.net_choices)
-        print("subnet_latency_info:", subnet_latency_info)  # Debugging output
+        #print("subnet_latency_info:", subnet_latency_info)  # Debugging output
 
         perf_exec_design = subnet_latency_info["perf_exec_design_contpow_fp"]
-        print("perf_exec_design:", perf_exec_design)
+        #print("perf_exec_design:", perf_exec_design)
         if perf_exec_design is None:
             print("Warning: perf_exec_design_contpow_fp is None!")
             perf_exec_design = []  # Prevents crash

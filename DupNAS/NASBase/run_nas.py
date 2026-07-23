@@ -206,8 +206,20 @@ def stage_fine_tune(global_settings: Settings, dataset, supernet, supernet_chkpt
     best_solution_info = fine_tune_best_solution(global_settings, dataset, supernet, supernet_chkpt_fname, stage_ss_opt_results['best_supernet_config'], best_solution)
 
     # overwrite json
-    file_utils.delete_file(stage_fine_tune_logfname)
-    file_utils.json_dump(stage_fine_tune_logfname, best_solution_info)
+    #file_utils.delete_file(stage_fine_tune_logfname)
+    #file_utils.json_dump(stage_fine_tune_logfname, best_solution_info)
+    if is_rank0_env():
+        file_utils.delete_file(stage_fine_tune_logfname)
+        file_utils.json_dump(
+            stage_fine_tune_logfname,
+            best_solution_info,
+        )
+
+        print(
+            f"Stage 4 result saved to {stage_fine_tune_logfname}",
+            flush=True,
+        )
+
 
 def initialize(global_settings: Settings):
     # randomizers
@@ -237,12 +249,10 @@ def _stage2_init_dist_if_needed(global_settings: Settings) -> bool:  # [ADDED]
         return True
     return False
 
-def _stage2_cleanup_dist_if_needed(global_settings: Settings):  # [ADDED]
-    dist_mode = global_settings.GLOBAL_SETTINGS.get('DIST_MODE', 'none')
-    if dist_mode in ('ddp', 'fsdp'):
-        import torch.distributed as dist
-        dist.barrier()
-        dist.destroy_process_group()
+def _stage2_cleanup_dist_if_needed(global_settings: Settings):
+    # Do not call dist.destroy_process_group() here.
+    # On some servers, NCCL shutdown hangs even after all ranks finish.
+    pass
 #-----------------------------------------------
 
 def run_nas(global_settings: Settings):
@@ -305,14 +315,29 @@ def run_nas(global_settings: Settings):
         if used_dist or is_rank0_env():  #[MODIFIED] run train on all ranks if dist
             stage_fine_tune(global_settings, dataset, best_supernet, original_supernet_train_chkpnt_fname,
                         stage_ss_opt_logfname, stage_evo_search_logfname, stage_fine_tune_logfname)
+        
+
+
         _stage2_cleanup_dist_if_needed(global_settings)  # [ADDED] tear down  
-        stages_completed.append(Stages.FINE_TUNE)
+
+
+        if is_rank0_env():
+            stages_completed.append(Stages.FINE_TUNE)
+
 
 def main():
     test_settings = Settings() # default settings
     test_settings = arg_parser(test_settings)
     run_nas(test_settings)
+    
 
 
 if __name__ == '__main__':
     main()
+
+    import os
+    import sys
+
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0)

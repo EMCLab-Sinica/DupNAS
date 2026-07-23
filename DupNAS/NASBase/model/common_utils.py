@@ -1102,7 +1102,7 @@ def get_dataset(global_settings: Settings, dataset = None, input_resolution=None
         train_loader = torch.utils.data.DataLoader(trainset, batch_size=trainset_batchsize, 
                                                 shuffle=True, pin_memory=True, num_workers=0)
         print(f"Train dataset size: {len(trainset)}")
-        print(trainset.class_to_idx)  # Should map class names to indices (0-99)
+        # print(trainset.class_to_idx)  # Should map class names to indices (0-99)
 
         
         valset = ImageFolder(root=val_dir, transform=valid_transform)
