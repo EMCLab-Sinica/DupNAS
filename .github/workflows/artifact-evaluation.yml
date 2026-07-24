@@ -159,6 +159,7 @@ jobs:
     runs-on: [self-hosted, ae-server]
     env:
       OPTION: ${{ inputs.option }}
+    timeout-minutes: 5000
     steps:
       - uses: actions/checkout@v6
       - name: Link models
@@ -171,4 +172,6 @@ jobs:
           name: results
           path: |
             DupNAS/NASBase/train_log/*.json
+            DupNAS/NASBase/checkpoints/*_supernet_*.pth
+            DupNAS/*-s*.txt
     

@@ -140,23 +140,40 @@ def stage_train_supernet(global_settings: Settings, dataset, supernet_name, supe
     else:
         supernet_best_ckpt, best_val_acc, best_val_loss = run_supernet_train_distributed(global_settings, dataset, supernet_chkpt_fname=supernet_train_chkpnt_fname, supernet=supernet)
 
-    stage_train_supernet_results = {
-        'supernet_best_ckpt': supernet_best_ckpt,
-        'best_val_acc': best_val_acc,
-        'best_val_loss': best_val_loss,
+    # stage_train_supernet_results = {
+    #     'supernet_best_ckpt': supernet_best_ckpt,
+    #     'best_val_acc': best_val_acc,
+    #     'best_val_loss': best_val_loss,
         
         # should we sample 1000 rnd subnets, and add more info - like : 
         # best subnet acc
         # worst subnet acc
         # avg subnet acc
-    }
+    # }
 
     # save stage TRAIN_SUPERNET results to JSON
     # overwrite json
 
-    stage_train_supernet_logfname_with_timestamp = stage_train_supernet_logfname.replace('.json', str(datetime.datetime.now().strftime('-%Y%m%d-%H%M%S')) + '.json')
-    file_utils.delete_file(stage_train_supernet_logfname)
-    file_utils.json_dump(stage_train_supernet_logfname, stage_train_supernet_results)
+    if is_rank0_env():
+        stage_train_supernet_results = {
+            'supernet_best_ckpt': supernet_best_ckpt,
+            'best_val_acc': best_val_acc,
+            'best_val_loss': best_val_loss,
+        }
+
+        file_utils.delete_file(stage_train_supernet_logfname)
+        file_utils.json_dump(stage_train_supernet_logfname, stage_train_supernet_results)
+
+        print(
+            f"Stage 2 result saved to {stage_train_supernet_logfname}: "
+            f"best_val_acc={best_val_acc}, "
+            f"best_val_loss={best_val_loss}",
+            flush=True,
+        )
+
+    # stage_train_supernet_logfname_with_timestamp = stage_train_supernet_logfname.replace('.json', str(datetime.datetime.now().strftime('-%Y%m%d-%H%M%S')) + '.json')
+    # file_utils.delete_file(stage_train_supernet_logfname)
+    # file_utils.json_dump(stage_train_supernet_logfname, stage_train_supernet_results)
 
 
 def stage_evo_search(global_settings, dataset, best_supernet, stage_evo_search_logfname):
