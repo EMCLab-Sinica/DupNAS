@@ -20,7 +20,7 @@ DupNAS is implemented in PyTorch on top of the popular [TinyNAS](https://github.
 <!-- This repository contains the full artifact for reproducing the NAS, model splitting, fine-tuning, ONNX export, and MCU deployment workflow used in DupNAS. -->
 <p align="center">
   <a href="assets/figures/SnapShot_end.jpg">
-    <img src="assets/figures/SnapShot_end.jpg" alt="DupNAS demo video thumbnail" width="220" align="middle">
+    <img src="assets/figures/SnapShot_end.jpg" alt="DupNAS demo video thumbnail" width="500" align="middle">
   </a>
   &nbsp;&nbsp;
   <a href="https://www.youtube.com/watch?v=o5U5cnoETkI">Watch the DupNAS demo on YouTube</a>
