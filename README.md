@@ -8,13 +8,7 @@ This project develops DupNAS, a framework that integrates neural architecture se
 
 DupNAS is implemented in PyTorch on top of the popular [TinyNAS](https://github.com/mit-han-lab/mcunet) framework for MCUs, with extensions to support multi-branch networks and integration with our splitting strategy. The resulting network solutions are deployed on an [STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html) microcontroller (ARM Cortex-M7 CPU, 216 MHz, 320 KB VM, and 1 MB NVM) running the TensorFlow Lite Micro (TFLite-Micro) inference engine. We evaluate DupNAS on three vision-based TinyML network families, namely MobileNetV2, ShuffleNetV2, and InceptionV3, under different memory constraints. All networks are trained on the ImageNet-100 dataset. DupNAS is compared against two existing splitting strategies, TinyTS and PatchTS.
 
-<p align="center">
-  <a href="assets/figures/SnapShot_end.jpg">
-    <img src="assets/figures/SnapShot_end.jpg" alt="DupNAS demo video thumbnail" width="220" align="middle">
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://www.youtube.com/watch?v=o5U5cnoETkI">Watch the DupNAS demo on YouTube</a>
-</p>
+
 
 
 <p align="center">
@@ -24,7 +18,13 @@ DupNAS is implemented in PyTorch on top of the popular [TinyNAS](https://github.
   <em>Overview of the DupNAS framework</em>
 </p>
 <!-- This repository contains the full artifact for reproducing the NAS, model splitting, fine-tuning, ONNX export, and MCU deployment workflow used in DupNAS. -->
-
+<p align="center">
+  <a href="assets/figures/SnapShot_end.jpg">
+    <img src="assets/figures/SnapShot_end.jpg" alt="DupNAS demo video thumbnail" width="220" align="middle">
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.youtube.com/watch?v=o5U5cnoETkI">Watch the DupNAS demo on YouTube</a>
+</p>
 
 
 ## 📌 File Structure
